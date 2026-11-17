@@ -1,0 +1,78 @@
+name: Construir ISO não homologada (manual)
+on:
+  workflow_dispatch:
+    inputs:
+      runner:
+        description: Executor; self-hosted exige VM Ubuntu 24.04 x64 dedicada
+        type: choice
+        options:
+          - ubuntu-24.04
+          - self-hosted
+        default: ubuntu-24.04
+      confirmar_recursos:
+        description: Conferi recursos; usar somente executor padrão gratuito ou VM própria existente.
+        type: boolean
+        required: true
+        default: false
+      otimizar_disco:
+        description: Remover SDKs dispensáveis somente da VM efêmera GitHub-hosted.
+        type: boolean
+        default: true
+      guardar_artefato:
+        description: Guardar candidato por 1 dia; confirme antes a franquia gratuita de armazenamento.
+        type: boolean
+        default: false
+permissions:
+  contents: read
+concurrency:
+  group: fenix-build
+  cancel-in-progress: false
+jobs:
+  build:
+    if: ${{ inputs.confirmar_recursos }}
+    runs-on: ${{ inputs.runner == 'self-hosted' && fromJSON('["self-hosted", "Linux", "X64", "fenix-noble"]') || 'ubuntu-24.04' }}
+    timeout-minutes: 180
+    steps:
+      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 verificado
+      - name: Liberar SDKs dispensáveis do runner hospedado
+        if: ${{ inputs.runner == 'ubuntu-24.04' && inputs.otimizar_disco }}
+        run: sudo --preserve-env=GITHUB_ACTIONS,RUNNER_ENVIRONMENT ./tools/prepare-hosted-runner.sh
+      - name: Conferir recursos antes de instalar dependências
+        shell: bash
+        run: |
+          df -h .
+          free -h
+          test "$(df -Pk . | awk 'END {print int($4/1024/1024)}')" -ge 35
+          test "$(awk '/MemTotal:/ {print int($2/1024)}' /proc/meminfo)" -ge 3800
+      - name: Instalar ferramentas do host
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y xorriso squashfs-tools gnupg curl rsync shellcheck desktop-file-utils python3-yaml qemu-system-x86 qemu-utils seabios
+      - name: Validar fontes e ambiente
+        run: |
+          ./tools/lint.sh
+          ./tools/preflight.sh
+      - name: Construir
+        run: sudo -E ./tools/build-iso.sh
+      - name: Inspecionar e dividir (não homologa instalação)
+        run: |
+          sudo ./tools/test-iso.sh inspect
+          sudo ./tools/package-release.sh
+      - name: Registrar hashes nos logs e no resumo
+        run: |
+          cat dist/SHA256SUMS
+          cat dist/SHA256SUMS >> "$GITHUB_STEP_SUMMARY"
+          echo 'Candidato não homologado. Instalação e reboot NÃO EXECUTADOS neste job.' >> "$GITHUB_STEP_SUMMARY"
+      - name: Guardar candidato por um dia; somente com opção explícita
+        if: ${{ inputs.guardar_artefato }}
+        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4 verificado
+        with:
+          name: FENIX-candidato-NAO-HOMOLOGADO
+          path: |
+            dist/release/
+            dist/boot-*.txt
+            dist/build-info.txt
+            dist/packages.txt
+            dist/gpg-verification.txt
+          retention-days: 1
+          compression-level: 0
