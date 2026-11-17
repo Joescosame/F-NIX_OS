@@ -2,6 +2,13 @@ name: Construir ISO não homologada (manual)
 on:
   workflow_dispatch:
     inputs:
+      modo:
+        description: Construir ISO ou testar somente o boot da candidata existente.
+        type: choice
+        options:
+          - construir
+          - boot-live
+        default: construir
       runner:
         description: Executor; self-hosted exige VM Ubuntu 24.04 x64 dedicada
         type: choice
@@ -29,7 +36,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build:
-    if: ${{ inputs.confirmar_recursos }}
+    if: ${{ inputs.confirmar_recursos && inputs.modo != 'boot-live' }}
     permissions:
       contents: write # Token exposto somente na etapa de rascunho; checkout sem credenciais persistidas.
     runs-on: ${{ inputs.runner == 'self-hosted' && fromJSON('["self-hosted", "Linux", "X64", "fenix-noble"]') || 'ubuntu-24.04' }}
@@ -76,3 +83,36 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: ./tools/store-candidate.sh
+  boot-live:
+    if: ${{ inputs.confirmar_recursos && inputs.modo == 'boot-live' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Conferir recursos e instalar QEMU oficial
+        run: |
+          test '${{ github.event.repository.private }}' = false
+          df -h .
+          test "$(df -Pk . | awk 'END {print int($4/1024/1024)}')" -ge 12
+          test "$(awk '/MemTotal:/ {print int($2/1024)}' /proc/meminfo)" -ge 6000
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 seabios python3-pil
+      - name: Reconstruir candidata e capturar boot real por dez minutos
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./tools/test-live-ci.sh
+      - name: Preservar evidências no rascunho sem artefatos Actions
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if test -d qa/boot-live && test -f dist/candidate-tag.txt; then
+            name="boot-live-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.tar.gz"
+            tar -czf "$name" -C qa boot-live
+            gh release upload "$(cat dist/candidate-tag.txt)" "$name" --repo Joescosame/F-NIX_OS
+            echo 'Coleta terminada. Aprovação do boot depende da revisão das capturas.' >> "$GITHUB_STEP_SUMMARY"
+          fi
