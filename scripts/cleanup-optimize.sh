@@ -2,20 +2,23 @@
 # Configuração reversível para RAM/SSD/HD; não toca em partições nem no GRUB.
 set -Eeuo pipefail
 [[ $EUID -eq 0 ]] || { echo 'Execute com sudo ou no chroot'; exit 1; }
+state=/var/lib/fenix/optimize-original
 case "${1:-apply}" in
   apply)
     install -d /etc/sysctl.d /etc/systemd
-    if [[ -f /etc/sysctl.d/90-fenix-memory.conf && ! -f /etc/sysctl.d/90-fenix-memory.conf.fenix-original ]]; then
-      cp -a /etc/sysctl.d/90-fenix-memory.conf /etc/sysctl.d/90-fenix-memory.conf.fenix-original
+    if [[ ! -d $state ]]; then
+      install -d -m 0700 "$state"
+      for path in /etc/sysctl.d/90-fenix-memory.conf /etc/systemd/zram-generator.conf; do
+        name=$(basename "$path")
+        if [[ -e $path || -L $path ]]; then cp -a "$path" "$state/$name";
+        else touch "$state/$name.absent"; fi
+      done
     fi
     cat > /etc/sysctl.d/90-fenix-memory.conf <<'CONF'
 # FÊNIX OS: ajustes modestos; usuários com HD/SSD podem comparar resultados.
 vm.swappiness=10
 vm.vfs_cache_pressure=50
 CONF
-    if [[ -f /etc/systemd/zram-generator.conf && ! -f /etc/systemd/zram-generator.conf.fenix-original ]]; then
-      cp -a /etc/systemd/zram-generator.conf /etc/systemd/zram-generator.conf.fenix-original
-    fi
     cat > /etc/systemd/zram-generator.conf <<'CONF'
 # 50% da RAM em swap comprimida; prioridade alta; requer systemd-zram-generator.
 [zram0]
@@ -27,13 +30,19 @@ CONF
     echo 'Validar depois: zramctl; swapon --show; sysctl vm.swappiness'
     ;;
   revert)
-    rm -f /etc/sysctl.d/90-fenix-memory.conf /etc/systemd/zram-generator.conf
-    if [[ -f /etc/sysctl.d/90-fenix-memory.conf.fenix-original ]]; then
-      mv /etc/sysctl.d/90-fenix-memory.conf.fenix-original /etc/sysctl.d/90-fenix-memory.conf
-    fi
-    if [[ -f /etc/systemd/zram-generator.conf.fenix-original ]]; then
-      mv /etc/systemd/zram-generator.conf.fenix-original /etc/systemd/zram-generator.conf
-    fi
+    [[ -d $state ]] || { echo 'Sem estado original; nenhuma configuração foi apagada.'; exit 0; }
+    for path in /etc/sysctl.d/90-fenix-memory.conf /etc/systemd/zram-generator.conf; do
+      name=$(basename "$path")
+      if [[ -e "$state/$name" || -L "$state/$name" ]]; then
+        rm -f "$path"
+        cp -a "$state/$name" "$path"
+      elif [[ -f "$state/$name.absent" ]]; then
+        rm -f "$path"
+      else
+        echo "Estado incompleto: $name; não removido" >&2; exit 1
+      fi
+    done
+    rm -rf -- "$state"
     echo 'Arquivos FÊNIX retirados; reinicie para remover zram e restaurar defaults.'
     ;;
   services)

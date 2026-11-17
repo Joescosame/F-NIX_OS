@@ -33,7 +33,11 @@ case "$action" in
   overlay) if command -v goverlay >/dev/null; then launch goverlay; else notify 'GOverlay não instalado ou indisponível na base atual.'; fi ;;
   overlay-on) /usr/local/lib/fenix/ativar-mangohud.sh on; notify 'Ativado para o próximo login. Use mangohud COMANDO para OpenGL, quando compatível.' ;;
   overlay-off) /usr/local/lib/fenix/ativar-mangohud.sh off; notify 'Desativado para o próximo login.' ;;
-  synaptic) if command -v synaptic >/dev/null; then launch synaptic; else notify 'Synaptic não instalado.'; fi ;;
+  synaptic)
+    if command -v synaptic-pkexec >/dev/null; then launch synaptic-pkexec
+    elif command -v synaptic >/dev/null && command -v pkexec >/dev/null; then launch pkexec "$(command -v synaptic)"
+    else notify 'Synaptic ou autenticação administrativa indisponível.'; fi
+    ;;
   update) if command -v mintupdate >/dev/null; then launch mintupdate; else notify 'mintupdate indisponível.'; fi ;;
   android) /usr/local/lib/fenix/waydroid-launcher.sh ;;
   # Newelle é FASE 2: a ISO base não instala o aplicativo.

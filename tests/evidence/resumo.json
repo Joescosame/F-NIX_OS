@@ -1,0 +1,39 @@
+{
+  "source_files_verified": 36,
+  "source_zip_sha256": "68e0a0187992b4e90afb862e5ed6daf3f03bf899c7b78f7787445a3b09a0eddc",
+  "mint_iso_sha256": "45a835b5dddaf40e84d776549e0b19b3fbd49673b6cc6434ebddbfcd217df776",
+  "iso_bytes": 3033710592,
+  "powershell": "5.1.26100.9818",
+  "results": [
+    {
+      "check": "Validação portátil",
+      "exit_code": 0,
+      "status": "PASSOU"
+    },
+    {
+      "check": "Unittest (15 executados; 1 snapshot Linux pulado)",
+      "exit_code": 0,
+      "status": "PASSOU"
+    },
+    {
+      "check": "ShellCheck 0.11.0, severity warning/error",
+      "exit_code": 0,
+      "status": "PASSOU"
+    }
+  ],
+  "not_executed": [
+    "ISO build",
+    "SeaBIOS live boot",
+    "installer",
+    "disk reboot",
+    "Xfce/Hub runtime",
+    "zram runtime",
+    "physical H55"
+  ],
+  "blocked": [
+    "GPG sandbox Windows",
+    "bash -n sandbox Windows",
+    "desktop-file-validate ausente",
+    "GitHub create_repository ausente; Firefox bloqueado"
+  ]
+}

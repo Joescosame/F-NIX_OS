@@ -1,11 +1,12 @@
 #!/usr/bin/env bash
 # Snapshot datado: inventário, benchmarks opcionais, sensores, gráficos e logs de SO.
 # Não necessita root para métricas comuns; não sobrescreve dados anteriores.
-set -u
+set -Eeuo pipefail
+umask 077
 outroot="$HOME/TestesPC/snapshots"
 mkdir -p "$outroot" "$HOME/TestesPC/benchmarks" "$HOME/TestesPC/historico" "$HOME/TestesPC/logs"
 folder="$outroot/$(date +%Y%m%d_%H%M%S)_$$_$(date +%N)"
-mkdir -m 700 -p "$folder"
+mkdir -m 700 "$folder"
 run() {
   local name="$1"; shift
   if command -v "$1" >/dev/null 2>&1; then
@@ -42,6 +43,8 @@ fi
 if command -v python3 >/dev/null 2>&1; then
   timeout 10s python3 /usr/local/lib/fenix/historico-sensores.py --duration 1 --interval 1 > "$folder/historico-coleta.txt" 2>&1 || true
 fi
-( cd "$folder" && sha256sum ./* > SHA256SUMS.txt 2>/dev/null ) || true
+( cd "$folder" && find . -maxdepth 1 -type f ! -name SHA256SUMS.txt -print0 | sort -z | xargs -0 sha256sum > SHA256SUMS.txt )
 printf 'Snapshot salvo: %s\n' "$folder"
-command -v yad >/dev/null 2>&1 && yad --info --title='FÊNIX' --text="Snapshot salvo em:\n$folder" --button=OK:0 || true
+if [[ ${FENIX_NO_GUI:-0} != 1 ]] && command -v yad >/dev/null 2>&1; then
+  yad --info --title='FÊNIX' --text="Snapshot salvo em:\n$folder" --button=OK:0 || true
+fi

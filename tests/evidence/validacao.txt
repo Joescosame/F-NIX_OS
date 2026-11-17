@@ -1,0 +1,1 @@
+PASSOU: Python AST, YAML, campos desktop, SVG, estrutura e finais de linha.

@@ -1,0 +1,11 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=Instalar FÊNIX (modo offline)
+Comment=Instalador com seleção local de fuso e sem espera por NTP
+Exec=/usr/local/lib/fenix/instalar-offline.sh
+TryExec=/usr/bin/ubiquity
+Icon=ubiquity
+Terminal=false
+Categories=System;
+StartupNotify=true

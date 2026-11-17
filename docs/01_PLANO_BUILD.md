@@ -1,3 +1,5 @@
+> Documento histórico v0.2.2 preservado. Para o procedimento atual, siga COMECE_AQUI.md, BUILD.md, QA.md e NEWELLE_FASE2.md. As instruções antigas não autorizam executar módulos ou publicar resultados.
+
 # 01 — Plano de build detalhado (Cubic com chroot)
 
 ## Decisão de arquitetura

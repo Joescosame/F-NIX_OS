@@ -1,0 +1,12 @@
+{
+  "iso_sha256": "PREENCHER_COM_HASH_REAL",
+  "tests": {
+    "legacy_live": {"status": "NÃO EXECUTADO", "evidence": []},
+    "offline_install_mbr": {"status": "NÃO EXECUTADO", "evidence": []},
+    "disk_boot_without_iso": {"status": "NÃO EXECUTADO", "evidence": []},
+    "login_xfce_hub": {"status": "NÃO EXECUTADO", "evidence": []},
+    "history_snapshot": {"status": "NÃO EXECUTADO", "evidence": []},
+    "zram_swap_services": {"status": "NÃO EXECUTADO", "evidence": []}
+  },
+  "physical_h55": "NÃO EXECUTADO"
+}

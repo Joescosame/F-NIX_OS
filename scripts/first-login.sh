@@ -8,7 +8,10 @@ marker="$HOME/.local/state/fenix/primeiro-login-v02"
 mkdir -p "$(dirname "$marker")" "$HOME/.config/MangoHud"
 for sub in benchmarks historico snapshots logs; do mkdir -p "$HOME/TestesPC/$sub"; done
 if [[ ! -e "$HOME/.config/MangoHud/MangoHud.conf" ]]; then cp /usr/local/share/fenix/templates/MangoHud.conf "$HOME/.config/MangoHud/MangoHud.conf"; fi
-/usr/local/lib/fenix/configure-xfce.sh >> "$HOME/TestesPC/logs/primeiro-login.log" 2>&1 || true
+if ! /usr/local/lib/fenix/configure-xfce.sh >> "$HOME/TestesPC/logs/primeiro-login.log" 2>&1; then
+  echo 'Configuração incompleta; será tentada novamente no próximo login.' >&2
+  exit 1
+fi
 /usr/local/lib/fenix/configure-gestures.sh >> "$HOME/TestesPC/logs/primeiro-login.log" 2>&1 || true
 # Não marque concluído se faltar o gerenciador de configurações do XFCE.
 if command -v xfconf-query >/dev/null 2>&1; then touch "$marker"; fi

@@ -1,3 +1,5 @@
+> Documento histórico v0.2.2 preservado. Para o procedimento atual, siga COMECE_AQUI.md, BUILD.md, QA.md e NEWELLE_FASE2.md. As instruções antigas não autorizam executar módulos ou publicar resultados.
+
 # 06 — Newelle com DeepSeek (fase 2, opcional)
 
 **Status:** projeto de build, sem compilação/homologação no Mint 22.3 real. **A ISO base tem prioridade.**

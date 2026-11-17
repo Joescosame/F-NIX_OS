@@ -1,5 +1,7 @@
 # Testes automáticos disponíveis
 
+Procedimento atual: `./tools/lint.sh` e `docs/QA.md`. Abaixo está o procedimento mínimo preservado da fonte v0.2.2. Consulte `docs/RESULTADOS.md` para os resultados efetivamente executados. Os testes usam dados temporários e não aprovam uma ISO por existência de scripts.
+
 No host Linux:
 ```
 bash scripts/teste-sintaxe.sh

@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Personalização por usuário no primeiro login XFCE (não rodar em chroot).
-set -u
+set -Eeuo pipefail
 if [[ -z "${DISPLAY:-}" ]]; then echo 'Abra uma sessão gráfica do XFCE primeiro.'; exit 1; fi
 command -v xfconf-query >/dev/null || { echo 'xfconf-query ausente'; exit 1; }
 backup="$HOME/.local/share/fenix/backups/$(date +%Y%m%d_%H%M%S)_$$"
@@ -13,9 +13,9 @@ done
 set_pref() { # canal propriedade tipo valor; atualiza ou cria
   local c="$1" p="$2" t="$3" v="$4"
   if xfconf-query -c "$c" -p "$p" >/dev/null 2>&1; then
-    xfconf-query -c "$c" -p "$p" -s "$v" >/dev/null 2>&1 || true
+    xfconf-query -c "$c" -p "$p" -s "$v"
   else
-    xfconf-query -c "$c" -p "$p" -n -t "$t" -s "$v" >/dev/null 2>&1 || true
+    xfconf-query -c "$c" -p "$p" -n -t "$t" -s "$v"
   fi
 }
 c=xfce4-keyboard-shortcuts
@@ -40,7 +40,7 @@ if command -v xcape >/dev/null 2>&1; then
 [Desktop Entry]
 Type=Application
 Name=FÊNIX - Tecla Super
-Exec=xcape -e Super_L=Control_L|Escape
+Exec=xcape -e "Super_L=Control_L|Escape"
 OnlyShowIn=XFCE;
 NoDisplay=true
 X-GNOME-Autostart-enabled=true

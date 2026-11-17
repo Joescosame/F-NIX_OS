@@ -1,0 +1,17 @@
+/work/
+/cache/
+/dist/
+/qa/
+*.iso
+*.qcow2
+*.vdi
+*.vmdk
+*.deb
+*.part[0-9]*
+*.log
+__pycache__/
+*.pyc
+.env*
+*.key
+*.pem
+!tests/fixtures/*

@@ -1,0 +1,21 @@
+test_approval_rejects_unexecuted_and_different_iso (test_core.BuildSafetyTests.test_approval_rejects_unexecuted_and_different_iso) ... ok
+test_installer_manifests_keep_profile_and_language (test_core.BuildSafetyTests.test_installer_manifests_keep_profile_and_language) ... ok
+test_no_physical_disk_arguments_in_harness (test_core.BuildSafetyTests.test_no_physical_disk_arguments_in_harness) ... ok
+test_history_csv_jsonl_and_limits (test_core.OfflineTests.test_history_csv_jsonl_and_limits) ... ok
+test_qemu_reboot_has_no_iso_and_offline_no_network (test_core.OfflineTests.test_qemu_reboot_has_no_iso_and_offline_no_network) ... ok
+test_snapshot_hash_manifest (test_core.OfflineTests.test_snapshot_hash_manifest) ... skipped 'Snapshot requer utilitários Linux'
+test_corruption_is_rejected (test_core.ReleaseTests.test_corruption_is_rejected) ... ok
+test_missing_part_is_rejected (test_core.ReleaseTests.test_missing_part_is_rejected) ... ok
+test_roundtrip_and_no_overwrite (test_core.ReleaseTests.test_roundtrip_and_no_overwrite) ... ok
+test_traversal_order_and_oversize_rejected (test_core.ReleaseTests.test_traversal_order_and_oversize_rejected) ... ok
+test_windows_powershell_51_roundtrip (test_core.ReleaseTests.test_windows_powershell_51_roundtrip) ... ok
+test_windows_powershell_rejects_corruption (test_core.ReleaseTests.test_windows_powershell_rejects_corruption) ... ok
+test_original_reproduces_none_get_data (test_core.TimezoneTests.test_original_reproduces_none_get_data) ... ok
+test_patch_handles_cancelled_empty_and_malformed (test_core.TimezoneTests.test_patch_handles_cancelled_empty_and_malformed) ... ok
+test_patch_idempotent_and_unknown_layout_rejected (test_core.TimezoneTests.test_patch_idempotent_and_unknown_layout_rejected) ... ok
+test_valid_reply_and_stale_reply (test_core.TimezoneTests.test_valid_reply_and_stale_reply) ... ok
+
+----------------------------------------------------------------------
+Ran 16 tests in 3.191s
+
+OK (skipped=1)

@@ -1,3 +1,5 @@
+> Documento histórico v0.2.2 preservado. Para o procedimento atual, siga COMECE_AQUI.md, BUILD.md, QA.md e NEWELLE_FASE2.md. As instruções antigas não autorizam executar módulos ou publicar resultados.
+
 # 04 — Guia rápido pós-instalação FÊNIX OS (PT-BR)
 
 O FÊNIX foi pensado para funcionar sem decorar comandos. O Linux Mint Xfce continua o sistema real; o Hub reúne as ferramentas de testes num único lugar. O Hub aparece no menu com o nome **Hub de Testes FÊNIX**, e pode ser fixado no Plank.
