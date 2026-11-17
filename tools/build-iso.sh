@@ -6,7 +6,7 @@ source "$(dirname -- "$0")/common.sh"
 bash "$ROOT/tools/preflight.sh"
 if [[ ${FENIX_BUILD_NAMESPACE:-} != 1 ]]; then
   export FENIX_BUILD_NAMESPACE=1
-  exec unshare --mount --pid --fork --propagation private -- "$0" "$@"
+  exec unshare --mount --pid --fork --mount-proc --propagation private -- "$0" "$@"
 fi
 bash "$ROOT/tools/fetch-base.sh"
 iso=$(cat "$ROOT/cache/base-path.txt")
@@ -21,7 +21,9 @@ cleanup() {
   local status=$? failed=0
   trap - EXIT
   for ((i=${#mounts[@]}-1; i>=0; i--)); do
-    umount "${mounts[i]}" || failed=1
+    if mountpoint -q "${mounts[i]}"; then
+      bash "$ROOT/tools/unmount-tree.sh" "${mounts[i]}" || failed=1
+    fi
   done
   printf 'Build terminou: código %s. Trabalho preservado em %s\n' "$status" "$work"
   ((failed == 0)) || status=1
@@ -67,7 +69,11 @@ cp -a "$work/resolv.original" "$rootfs/etc/resolv.conf"
 if [[ -e "$work/policy.original" ]]; then cp -a "$work/policy.original" "$rootfs/usr/sbin/policy-rc.d"; fi
 chroot "$rootfs" dpkg-query -W -f='${Package} ${Version}\n' > "$tree/casper/filesystem.manifest"
 python3 "$ROOT/tools/update-manifests.py" "$tree/casper" "$rootfs"
-for ((i=${#mounts[@]}-1; i>=0; i--)); do umount "${mounts[i]}"; done
+for ((i=${#mounts[@]}-1; i>=0; i--)); do
+  if mountpoint -q "${mounts[i]}"; then
+    bash "$ROOT/tools/unmount-tree.sh" "${mounts[i]}"
+  fi
+done
 mounts=()
 rm -rf -- "$rootfs/root/fenix"
 rm -f "$rootfs/root/fenix-chroot.sh"
@@ -77,7 +83,9 @@ du -sx --block-size=1 "$rootfs" | cut -f1 > "$tree/casper/filesystem.size"
 python3 "$ROOT/tools/iso-md5.py" "$tree"
 out="$ROOT/dist/FENIX-OS-Legacy-amd64.iso"
 # Importa e reproduz o boot original, incluindo MBR híbrido e El Torito.
-xorriso -indev "$iso" -outdev "$out.partial" -overwrite on -map "$tree" / -boot_image any replay -commit -end
+xorriso -indev "$iso" -outdev "$out.partial" -overwrite on \
+  -map "$tree/casper" /casper -map "$tree/md5sum.txt" /md5sum.txt \
+  -boot_image any replay -commit -end
 mv -- "$out.partial" "$out"
 [[ $(stat -c %s "$out") -lt 7800000000 ]] || die 'ISO excede limite conservador para pendrive de 8 GB.'
 (( $(stat -c %s "$out") < 4000000000 )) || echo 'AVISO: ISO acima da meta de 4 GB.'

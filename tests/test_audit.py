@@ -32,11 +32,14 @@ class AuditTests(unittest.TestCase):
         self.assertEqual(set(trigger),{'workflow_dispatch'})
         inputs=trigger['workflow_dispatch']['inputs']
         self.assertEqual(inputs['runner']['options'],['ubuntu-24.04','self-hosted'])
-        self.assertIs(inputs['guardar_artefato']['default'],False)
+        self.assertIs(inputs['guardar_rascunho']['default'],False)
         self.assertIs(inputs['confirmar_recursos']['default'],False)
         uploads=[s for s in d['jobs']['build']['steps'] if 'actions/upload-artifact@' in s.get('uses','')]
-        self.assertEqual(len(uploads),1)
-        self.assertEqual(uploads[0]['if'],'${{ inputs.guardar_artefato }}')
+        self.assertEqual(len(uploads),0)
+        drafts=[s for s in d['jobs']['build']['steps'] if s.get('run')=='./tools/store-candidate.sh']
+        self.assertEqual(drafts[0]['if'],'${{ inputs.guardar_rascunho }}')
+        script=(ROOT/'tools/store-candidate.sh').read_text(encoding='utf-8')
+        self.assertIn('--draft --prerelease',script)
 
     @unittest.skipUnless(sys.platform.startswith('linux'), 'Proteção do runner requer Bash/Linux')
     def test_cleanup_refuses_non_hosted_environment(self):

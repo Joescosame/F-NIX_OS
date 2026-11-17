@@ -81,6 +81,13 @@ class ReleaseTests(unittest.TestCase):
         self.assertEqual(release.join(self.parts).read_bytes(), self.data)
         with self.assertRaises(FileExistsError): release.join(self.parts)
 
+    def test_verify_rejects_wrong_final_hash_without_joining(self):
+        self.assertEqual(release.verify(self.parts), self.manifest)
+        self.manifest['sha256'] = '0'*64
+        (self.parts/'manifesto.json').write_text(json.dumps(self.manifest))
+        with self.assertRaises(ValueError): release.verify(self.parts)
+        self.assertFalse((self.parts/release.NAME).exists())
+
     def test_corruption_is_rejected(self):
         p = self.parts / self.manifest['parts'][0]['name']
         p.write_bytes(b'x'*p.stat().st_size)

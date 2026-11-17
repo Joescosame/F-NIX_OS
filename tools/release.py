@@ -72,16 +72,28 @@ def split(iso, out, part_size=PART_LIMIT):
         shutil.copy2(here / name, out / name)
     return m
 
-def join(folder):
+def verify(folder):
     m = validate(json.loads((folder / 'manifesto.json').read_text(encoding='utf-8')))
+    fullhash = hashlib.sha256()
+    for p in m['parts']:
+        path = folder / p['name']
+        if not path.exists():
+            raise FileNotFoundError('Parte ausente: '+p['name'])
+        if path.is_symlink() or not path.is_file() or path.stat().st_size != p['size'] or digest(path) != p['sha256']:
+            raise ValueError('Parte ausente/corrompida: '+p['name'])
+        with path.open('rb') as stream:
+            while data := stream.read(CHUNK):
+                fullhash.update(data)
+    if fullhash.hexdigest() != m['sha256']:
+        raise ValueError('Hash final do manifesto não corresponde às partes')
+    return m
+
+def join(folder):
+    m = verify(folder)
     final = folder / NAME
     partial = folder / (NAME+'.partial')
     if final.exists() or partial.exists():
         raise FileExistsError('Saída já existe; não será sobrescrita')
-    for p in m['parts']:
-        path = folder / p['name']
-        if path.is_symlink() or path.stat().st_size != p['size'] or digest(path) != p['sha256']:
-            raise ValueError('Parte ausente/corrompida: '+p['name'])
     with partial.open('xb') as dst:
         for p in m['parts']:
             with (folder / p['name']).open('rb') as src:
@@ -97,6 +109,8 @@ if __name__ == '__main__':
     sub = parser.add_subparsers(dest='action', required=True)
     sp = sub.add_parser('split'); sp.add_argument('iso', type=pathlib.Path); sp.add_argument('out', type=pathlib.Path)
     jp = sub.add_parser('join'); jp.add_argument('folder', type=pathlib.Path)
+    vp = sub.add_parser('verify'); vp.add_argument('folder', type=pathlib.Path)
     args = parser.parse_args()
     if args.action == 'split': split(args.iso, args.out)
-    else: join(args.folder)
+    elif args.action == 'join': join(args.folder)
+    else: verify(args.folder)

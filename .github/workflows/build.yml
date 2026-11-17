@@ -2,6 +2,13 @@ name: Construir ISO não homologada (manual)
 on:
   workflow_dispatch:
     inputs:
+      modo:
+        description: Construir ISO ou testar somente o boot da candidata existente.
+        type: choice
+        options:
+          - construir
+          - boot-live
+        default: construir
       runner:
         description: Executor; self-hosted exige VM Ubuntu 24.04 x64 dedicada
         type: choice
@@ -18,8 +25,8 @@ on:
         description: Remover SDKs dispensáveis somente da VM efêmera GitHub-hosted.
         type: boolean
         default: true
-      guardar_artefato:
-        description: Guardar candidato por 1 dia; confirme antes a franquia gratuita de armazenamento.
+      guardar_rascunho:
+        description: Guardar partes em Release de rascunho não homologada; sem artefatos Actions.
         type: boolean
         default: false
 permissions:
@@ -29,18 +36,26 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build:
-    if: ${{ inputs.confirmar_recursos }}
+    if: ${{ inputs.confirmar_recursos && inputs.modo != 'boot-live' }}
+    permissions:
+      contents: write # Token exposto somente na etapa de rascunho; checkout sem credenciais persistidas.
     runs-on: ${{ inputs.runner == 'self-hosted' && fromJSON('["self-hosted", "Linux", "X64", "fenix-noble"]') || 'ubuntu-24.04' }}
     timeout-minutes: 180
     steps:
-      - uses: actions/checkout@11d5960a326750d5838078e36cf38b85af677262 # v4 verificado
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6 verificado
+        with:
+          persist-credentials: false
       - name: Liberar SDKs dispensáveis do runner hospedado
         if: ${{ inputs.runner == 'ubuntu-24.04' && inputs.otimizar_disco }}
         run: sudo --preserve-env=GITHUB_ACTIONS,RUNNER_ENVIRONMENT ./tools/prepare-hosted-runner.sh
       - name: Conferir recursos antes de instalar dependências
+        env:
+          REPO_PUBLIC: ${{ !github.event.repository.private }}
         shell: bash
         run: |
-          df -h .
+          echo "Recursos antes do build:" >> "$GITHUB_STEP_SUMMARY"
+          df -h . | tee -a "$GITHUB_STEP_SUMMARY"
+          test "$REPO_PUBLIC" = true
           free -h
           test "$(df -Pk . | awk 'END {print int($4/1024/1024)}')" -ge 35
           test "$(awk '/MemTotal:/ {print int($2/1024)}' /proc/meminfo)" -ge 3800
@@ -63,16 +78,41 @@ jobs:
           cat dist/SHA256SUMS
           cat dist/SHA256SUMS >> "$GITHUB_STEP_SUMMARY"
           echo 'Candidato não homologado. Instalação e reboot NÃO EXECUTADOS neste job.' >> "$GITHUB_STEP_SUMMARY"
-      - name: Guardar candidato por um dia; somente com opção explícita
-        if: ${{ inputs.guardar_artefato }}
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4 verificado
+      - name: Guardar candidata em Release de rascunho
+        if: ${{ inputs.guardar_rascunho }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./tools/store-candidate.sh
+  boot-live:
+    if: ${{ inputs.confirmar_recursos && inputs.modo == 'boot-live' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 30
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
         with:
-          name: FENIX-candidato-NAO-HOMOLOGADO
-          path: |
-            dist/release/
-            dist/boot-*.txt
-            dist/build-info.txt
-            dist/packages.txt
-            dist/gpg-verification.txt
-          retention-days: 1
-          compression-level: 0
+          persist-credentials: false
+      - name: Conferir recursos e instalar QEMU oficial
+        run: |
+          test '${{ github.event.repository.private }}' = false
+          df -h .
+          test "$(df -Pk . | awk 'END {print int($4/1024/1024)}')" -ge 12
+          test "$(awk '/MemTotal:/ {print int($2/1024)}' /proc/meminfo)" -ge 6000
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 seabios python3-pil
+      - name: Reconstruir candidata e capturar boot real por dez minutos
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: ./tools/test-live-ci.sh
+      - name: Preservar evidências no rascunho sem artefatos Actions
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if test -d qa/boot-live && test -f dist/candidate-tag.txt; then
+            name="boot-live-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.tar.gz"
+            tar -czf "$name" -C qa boot-live
+            gh release upload "$(cat dist/candidate-tag.txt)" "$name" --repo Joescosame/F-NIX_OS
+            echo 'Coleta terminada. Aprovação do boot depende da revisão das capturas.' >> "$GITHUB_STEP_SUMMARY"
+          fi
