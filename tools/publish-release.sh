@@ -6,7 +6,7 @@ source "$(dirname -- "$0")/common.sh"
 tag=$2
 need gh
 python3 "$ROOT/tools/check-approval.py"
-[[ $(gh repo view Joescosame/FENIX-OS-Legacy --json isPrivate --jq .isPrivate) == true ]] || die 'Repositório precisa continuar privado.'
+[[ $(gh repo view Joescosame/F-NIX_OS --json nameWithOwner --jq .nameWithOwner) == Joescosame/F-NIX_OS ]] || die 'Repositório oficial não acessível.'
 [[ -z $(git -C "$ROOT" status --porcelain) ]] || die 'Faça commit das fontes antes de preparar Release.'
 [[ -d "$ROOT/dist/release" ]] || die 'Execute package-release.sh primeiro.'
 python3 - "$ROOT/dist/release" "$ROOT/qa/aprovacao.json" <<'PY'
@@ -25,5 +25,5 @@ Candidato FÊNIX OS Legacy. Pré-lançamento, sem homologação física H55 pres
 Baixe todas as partes, manifesto e JUNTAR_ISO.ps1; execute o script para verificar e reconstruir a ISO.
 Consulte docs/QA.md e docs/INSTALACAO_WINDOWS_RUFUS.md. Nenhuma cobrança é habilitada por este script.
 TEXT
-gh release create "$tag" "$ROOT/dist/release/"* --repo Joescosame/FENIX-OS-Legacy --target "$(git -C "$ROOT" rev-parse HEAD)" --draft --prerelease --title "FÊNIX OS Legacy $tag (candidato)" --notes-file "$notes"
+gh release create "$tag" "$ROOT/dist/release/"* --repo Joescosame/F-NIX_OS --target "$(git -C "$ROOT" rev-parse HEAD)" --draft --prerelease --title "FÊNIX OS Legacy $tag (candidato)" --notes-file "$notes"
 echo 'Draft prerelease criada. Revisão e publicação final continuam manuais; nunca marcar estável sem aprovação.'

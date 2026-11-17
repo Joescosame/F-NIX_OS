@@ -6,7 +6,7 @@ source "$(dirname -- "$0")/common.sh"
 bash "$ROOT/tools/preflight.sh"
 if [[ ${FENIX_BUILD_NAMESPACE:-} != 1 ]]; then
   export FENIX_BUILD_NAMESPACE=1
-  exec unshare --mount --propagation private -- "$0" "$@"
+  exec unshare --mount --pid --fork --propagation private -- "$0" "$@"
 fi
 bash "$ROOT/tools/fetch-base.sh"
 iso=$(cat "$ROOT/cache/base-path.txt")
@@ -36,11 +36,23 @@ unsquashfs -d "$rootfs" "$tree/casper/filesystem.squashfs"
 rm -- "$tree/casper/filesystem.squashfs"
 cp "$tree/casper/filesystem.manifest-remove" "$work/manifest-remove-original"
 mkdir -p "$rootfs/root/fenix"
-rsync -a --exclude=.git --exclude=cache --exclude=work --exclude=dist --exclude=qa "$ROOT/" "$rootfs/root/fenix/"
+rsync -a --exclude=.git --exclude=cache --exclude=work --exclude=dist --exclude=qa --exclude=__pycache__ "$ROOT/" "$rootfs/root/fenix/"
 install -m 0755 "$ROOT/tools/chroot-customize.sh" "$rootfs/root/fenix-chroot.sh"
 for point in dev proc sys; do mkdir -p "$rootfs/$point"; done
-mount --bind /dev "$rootfs/dev"; mounts+=("$rootfs/dev")
-mount -t devpts devpts "$rootfs/dev/pts"; mounts+=("$rootfs/dev/pts")
+# Não expor discos físicos/virtuais do executor ao apt ou aos hooks do chroot.
+mount -t tmpfs -o mode=0755,nosuid tmpfs "$rootfs/dev"; mounts+=("$rootfs/dev")
+mkdir -p "$rootfs/dev/pts" "$rootfs/dev/shm"
+chmod 1777 "$rootfs/dev/shm"
+for spec in 'null 1 3' 'zero 1 5' 'random 1 8' 'urandom 1 9' 'tty 5 0'; do
+  read -r name major minor <<< "$spec"
+  mknod -m 0666 "$rootfs/dev/$name" c "$major" "$minor"
+done
+mount -t devpts -o newinstance,ptmxmode=0666,mode=0620 devpts "$rootfs/dev/pts"; mounts+=("$rootfs/dev/pts")
+ln -s pts/ptmx "$rootfs/dev/ptmx"
+ln -s /proc/self/fd "$rootfs/dev/fd"
+ln -s /proc/self/fd/0 "$rootfs/dev/stdin"
+ln -s /proc/self/fd/1 "$rootfs/dev/stdout"
+ln -s /proc/self/fd/2 "$rootfs/dev/stderr"
 mount -t proc proc "$rootfs/proc"; mounts+=("$rootfs/proc")
 mount -t sysfs -o ro sysfs "$rootfs/sys"; mounts+=("$rootfs/sys")
 cp -a "$rootfs/etc/resolv.conf" "$work/resolv.original"
@@ -65,7 +77,7 @@ du -sx --block-size=1 "$rootfs" | cut -f1 > "$tree/casper/filesystem.size"
 python3 "$ROOT/tools/iso-md5.py" "$tree"
 out="$ROOT/dist/FENIX-OS-Legacy-amd64.iso"
 # Importa e reproduz o boot original, incluindo MBR híbrido e El Torito.
-xorriso -indev "$iso" -outdev "$out.partial" -update_r "$tree" / -boot_image any replay -commit -end
+xorriso -indev "$iso" -outdev "$out.partial" -overwrite on -map "$tree" / -boot_image any replay -commit -end
 mv -- "$out.partial" "$out"
 [[ $(stat -c %s "$out") -lt 7800000000 ]] || die 'ISO excede limite conservador para pendrive de 8 GB.'
 (( $(stat -c %s "$out") < 4000000000 )) || echo 'AVISO: ISO acima da meta de 4 GB.'

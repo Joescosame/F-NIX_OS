@@ -1,4 +1,6 @@
-# Resultados da sessão — 16/11/2026
+# Resultados históricos da primeira etapa — 16/11/2026
+
+> Registro preservado da primeira entrega. A decisão posterior tornou F-NIX_OS o repositório oficial público. Para a etapa atual consulte AUDITORIA.md e Git no Windows em GIT_WINDOWS.md. O bloqueio histórico de criação de repositório não se aplica ao destino oficial já existente.
 
 Este relatório descreve evidências locais, não uma homologação da ISO.
 

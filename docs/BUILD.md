@@ -2,7 +2,7 @@
 
 ## Preparar uma VM descartável
 
-Use Ubuntu 24.04 x86_64, mínimo 4 GB RAM (8 GB recomendado), 35 GiB livres no filesystem do checkout (50 GiB recomendado). Reserve mais espaço para disco qcow2 e partes da Release; o pico aumenta se reter múltiplas árvores. O script não libera espaço removendo ferramentas do runner.
+Use Ubuntu 24.04 x86_64, mínimo 4 GB RAM (8 GB recomendado), 35 GiB livres no filesystem do checkout (50 GiB recomendado). Reserve mais espaço para disco qcow2 e partes da Release; o pico aumenta se reter múltiplas árvores. No host local não se removem ferramentas automaticamente.
 
 ```bash
 sudo apt-get update
@@ -32,11 +32,13 @@ O build retém o kernel/initrd oficiais e reproduz MBR híbrido e El Torito da m
 
 ## GitHub Actions
 
-Em Actions escolha **Validar fontes** ou **Construir ISO não homologada**, depois Run workflow. Todos os gatilhos são `workflow_dispatch`. Confira a franquia e o orçamento da conta antes de executar. Este projeto não contrata runner, não habilita cobrança e não muda visibilidade. Não executamos nenhum workflow nesta sessão.
+No [Actions do repositório oficial](https://github.com/Joescosame/F-NIX_OS/actions) escolha **Validar fontes** ou **Construir ISO não homologada**, depois Run workflow na `main`. Todos os gatilhos são `workflow_dispatch`; nenhuma compilação é iniciada por commit ou PR. Para construir, mantenha `runner=ubuntu-24.04`, marque `confirmar_recursos` e deixe `guardar_artefato=false` até verificar a franquia gratuita de armazenamento. Não executamos nenhum workflow nesta sessão.
 
-O runner padrão pode ter menos de 35 GiB livres. Nesse caso o job falha cedo, sem afirmar que há espaço suficiente. Aumentar o tempo limite não resolve falta de disco. Para runner próprio: VM dedicada Ubuntu 24.04 x64 com os rótulos `self-hosted`, `Linux`, `X64`, `fenix-noble`; selecione `self-hosted` no formulário. Não use um host com dados pessoais para executar builds root. O runner próprio também pode gerar custo no provedor escolhido; o projeto não o cria.
+Os runners **padrão** são gratuitos em repositórios públicos; runners maiores são pagos e não são opções deste projeto. Armazenamento de artefatos tem franquia separada. Nenhuma configuração de cobrança ou orçamento é alterada. Fontes: [runners oficiais](https://docs.github.com/en/actions/reference/runners/github-hosted-runners), [cobrança e armazenamento](https://docs.github.com/en/billing/concepts/product-billing/github-actions).
 
-O job faz validação e inspeção estrutural e guarda candidato por três dias. Não homologa instalação gráfica, não publica Release e não marca a ISO estável. A interface QEMU exige host Linux com sessão gráfica; execute os comandos de QA localmente. Sem KVM usa TCG, que é mais lento.
+O runner padrão pode ter menos de 35 GiB livres. `otimizar_disco=true` permite remover apenas SDKs Android, .NET, GHC e CodeQL da VM efêmera GitHub-hosted antes do preflight. O script recusa outro ambiente, inclusive runner próprio. Essa limpeza não garante espaço suficiente; se ainda faltar, o job para e registra a limitação. Aumentar o tempo limite não resolve falta de disco. Para runner próprio já existente: VM dedicada Ubuntu 24.04 x64 com os rótulos `self-hosted`, `Linux`, `X64`, `fenix-noble`. Não use um host com dados pessoais para executar builds root. O projeto não contrata nem cria esse runner.
+
+O job faz validação, build e inspeção estrutural, registra hashes e resultado no log/resumo. Sem `guardar_artefato`, a ISO fica somente na VM efêmera e não estará disponível após o job. Com a opção explicitamente habilitada, o candidato é guardado por um dia; o projeto não presume franquia de armazenamento disponível. Não homologa instalação gráfica, não publica Release e não marca a ISO estável. A interface QEMU exige host Linux com sessão gráfica; execute os comandos de QA localmente. Sem KVM usa TCG, que é mais lento.
 
 ## Cubic como alternativa
 

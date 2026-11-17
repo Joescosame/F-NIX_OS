@@ -1,6 +1,6 @@
 # Licenças e origem
 
-O ZIP de origem não contém LICENSE. Foi fornecido pelo usuário para alteração e publicação privada. Essa autorização de trabalho não demonstra uma licença pública para todos os componentes herdados. Não atribuímos MIT retroativamente aos scripts, documentos ou assets v0.2.2.
+O ZIP de origem não contém LICENSE. Foi fornecido pelo usuário para alteração e, na decisão atual, publicação no repositório oficial público. Essa autorização de trabalho não demonstra uma licença pública para todos os componentes herdados. Não atribuímos MIT retroativamente aos scripts, documentos ou assets v0.2.2.
 
 `LICENSE` licencia sob MIT as contribuições novas da automação, testes e guias desta entrega, exceto código derivado do Ubiquity. Os arquivos herdados permanecem sujeitos aos direitos de seus titulares, sem concessão adicional presumida. Antes de distribuição pública, o titular deve definir a licença dos arquivos herdados.
 

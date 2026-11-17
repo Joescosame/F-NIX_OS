@@ -14,7 +14,7 @@
 
 Nenhum script do host particiona ou formata disco. O construtor não recebe dispositivos de bloco como saída. O harness não aceita caminhos de discos fornecidos pelo usuário nem passagem de discos físicos. O instalador original continua com seleção e confirmação manuais de destino.
 
-O namespace evita propagação de mounts ao host. Uma política temporária impede inicialização de serviços no chroot. DNS e política original são restaurados antes da recompressão. Árvore e logs permanecem em `work/build.*` para investigação. Não se remove árvore de build automaticamente após falha; desmonte antes de limpar e use uma VM descartável.
+Os namespaces de montagem e processos evitam propagação de mounts e separam a árvore de processos. O chroot recebe `/dev` em tmpfs com somente dispositivos de caracteres essenciais e devpts próprio; discos do host não são compartilhados. Uma política temporária impede inicialização de serviços. Isso reduz exposição acidental, mas um chroot root não deve ser considerado uma sandbox para código malicioso: use somente fontes confiáveis numa VM descartável. DNS e política original são restaurados antes da recompressão. Árvore e logs permanecem em `work/build.*` para investigação. Não se remove árvore de build automaticamente após falha; desmonte antes de limpar.
 
 Mantemos kernel e initrd da base, driver i915/Mesa, sem driver Xorg forçado. Waydroid, HWall, HardInfo2, SMC e WhiteSur não são instalados pela base. MangoHud/GOverlay só são incluídos se houver candidato apt; continuam sujeitos a teste real. Vulkan e jogos recentes não são prometidos na Ironlake.
 

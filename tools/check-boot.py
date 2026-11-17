@@ -6,13 +6,14 @@ import sys
 
 def signature(path):
     text = pathlib.Path(path).read_text()
-    entries = re.findall(r'El Torito boot img\s*:\s*\d+\s+(BIOS|UEFI)\s+(\S+)\s+(\S+)', text)
-    if not any(e[0] == 'BIOS' for e in entries):
-        raise SystemExit('FALHOU: nenhuma entrada BIOS')
-    if not re.search(r'System area summary:.*(MBR|isohybrid)', text):
+    entries = re.findall(r'El Torito boot img\s*:\s*\d+\s+(BIOS|UEFI)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\S+)\s+(\d+)', text)
+    if not any(e[0] == 'BIOS' and e[1] == 'y' for e in entries):
+        raise SystemExit('FALHOU: nenhuma entrada BIOS habilitada')
+    if not re.search(r'System area summary:[^\n]*\bMBR\b', text):
         raise SystemExit('FALHOU: MBR híbrido ausente')
     return entries
 
-if signature(sys.argv[1]) != signature(sys.argv[2]):
-    raise SystemExit('FALHOU: plataformas ou atributos de boot divergiram')
-print('PASSOU: estrutura BIOS/El Torito preservada. Boot real pendente.')
+if __name__ == '__main__':
+    if signature(sys.argv[1]) != signature(sys.argv[2]):
+        raise SystemExit('FALHOU: plataformas ou atributos de boot divergiram')
+    print('PASSOU: estrutura BIOS/El Torito preservada. Boot real pendente.')

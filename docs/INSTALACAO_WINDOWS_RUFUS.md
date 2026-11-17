@@ -2,7 +2,7 @@
 
 **Ainda não há ISO FÊNIX ou Release publicada.** Este procedimento será usado quando existir candidato aprovado. Não tente gravar o ZIP de fontes como sistema operacional.
 
-1. Na Release aprovada do repositório privado, entre na conta com acesso e baixe todas as partes `.part001`, `.part002` etc., `manifesto.json`, `SHA256SUMS` e `JUNTAR_ISO.ps1` para a mesma pasta. Confira que nomes não ganharam `(1)` nem `.txt`. Não extraia as partes.
+1. Na Release aprovada do [repositório oficial público](https://github.com/Joescosame/F-NIX_OS/releases), baixe todas as partes `.part001`, `.part002` etc., `manifesto.json`, `SHA256SUMS` e `JUNTAR_ISO.ps1` para a mesma pasta. Confira que nomes não ganharam `(1)` nem `.txt`. Não extraia as partes.
 2. Use disco NTFS/exFAT com espaço para partes + ISO (aproximadamente duas vezes o tamanho da imagem). FAT32 não aceita arquivos de 4 GiB ou mais.
 3. Abra **Windows PowerShell** na pasta e execute:
 

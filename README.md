@@ -1,8 +1,10 @@
 # FÊNIX OS — Legacy Edition
 
+Repositório oficial: [Joescosame/F-NIX_OS](https://github.com/Joescosame/F-NIX_OS). Branch principal: main.
+
 Perfil e construtor de ISO para Linux Mint 22.3 Xfce / Ubuntu 24.04 LTS, x86_64, PT-BR. Alvo: Intel H55, i5-650 (2 núcleos/4 threads), 8 GB DDR3, Ironlake i915/Mesa, BIOS Legacy, SATA e instalação MBR.
 
-**Versão 0.3.0-dev: ISO NÃO CONSTRUÍDA e instalação NÃO HOMOLOGADA.** Não há ISO ou Release para download. Os testes portáteis e bloqueios estão em [RESULTADOS](docs/RESULTADOS.md). Organizar o código e corrigir o callback não conclui a missão de comprovar boot → instalação → reboot → login.
+**Versão 0.3.0-dev: ISO NÃO CONSTRUÍDA e instalação NÃO HOMOLOGADA.** Não há ISO ou Release para download. Os testes e bloqueios atuais estão na [auditoria](docs/AUDITORIA.md); os [resultados anteriores](docs/RESULTADOS.md) foram preservados. Organizar o código e corrigir o callback não conclui a missão de comprovar boot → instalação → reboot → login.
 
 ## Começar
 
@@ -34,8 +36,8 @@ Newelle/DeepSeek permanece [fase 2](docs/NEWELLE_FASE2.md), fora do build. HWall
 
 ## Publicação e origem
 
-O repositório Git local está preparado em `main`. A publicação GitHub não foi possível nesta sessão: o conector não oferece criação de repositório e o navegador foi bloqueado. O destino consultado `Joescosame/FENIX-OS-Legacy` retornou 404 (ausente ou sem acesso). Não declaramos repositório remoto criado.
+O destino oficial existente é público por decisão expressa do usuário. O progresso local v0.3.0 está preservado e integrado por branch de desenvolvimento, com PR para main. Não criar outro repositório. Consulte [Git no Windows](docs/GIT_WINDOWS.md) e [auditoria técnica](docs/AUDITORIA.md).
 
-`tools/PUBLICAR_GITHUB.ps1`, com Git e GitHub CLI autenticado na conta correta, cria **privado**, confere visibilidade e faz push sem força. Não muda a visibilidade nem inicia Actions. Alternativamente crie o repositório privado vazio no GitHub e conceda acesso ao conector para publicação em continuação.
+Os workflows continuam manuais. A construção usa o runner padrão Ubuntu 24.04; o upload da ISO para Actions fica desligado por padrão para não presumir franquia gratuita de armazenamento. Recursos insuficientes bloqueiam o job; não se contrata executor maior.
 
 Fonte primária: ZIP v0.2.2; 36 arquivos conferidos contra o manifesto original. README/manifesto originais e guias numerados foram preservados. Leia [arquitetura](docs/ARQUITETURA.md), [licenças](docs/LICENCAS.md), [Windows/Rufus](docs/INSTALACAO_WINDOWS_RUFUS.md) e [histórico](CHANGELOG.md).

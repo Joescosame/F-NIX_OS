@@ -24,7 +24,8 @@ for p in (ROOT / '.github/workflows').glob('*.yml'):
     assert set(triggers) == {'workflow_dispatch'}, p
     assert d['permissions']['contents'] == 'read', p
 required = ['README.md','LICENSE','CHANGELOG.md','docs/COMECE_AQUI.md','docs/ARQUITETURA.md',
-            'docs/BUILD.md','docs/QA.md','docs/INSTALACAO_WINDOWS_RUFUS.md','docs/NEWELLE_FASE2.md']
+            'docs/BUILD.md','docs/QA.md','docs/INSTALACAO_WINDOWS_RUFUS.md','docs/NEWELLE_FASE2.md',
+            'docs/GIT_WINDOWS.md','docs/AUDITORIA.md']
 for name in required:
     assert (ROOT / name).is_file(), name
 for p in list((ROOT/'tools').glob('*.sh')) + list((ROOT/'scripts').glob('*.sh')):

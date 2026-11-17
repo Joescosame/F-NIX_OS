@@ -28,7 +28,7 @@ Repita `install --online` e `reboot --online`; usa outro qcow2 em `qa/online`. T
 
 Para aprovar candidato, preencher `qa/aprovacao.json` conforme `config/aprovacao.example.json`, com hash da ISO, cada teste obrigatório e evidências relativas à pasta QA. Não copiar PASSOU sem executar. `tools/publish-release.sh` recusa resultados ausentes, hash divergente ou evidências inexistentes e só cria **draft prerelease**, com autorização explícita na linha de comando. Não há publicação estável automatizada.
 
-Registros do QEMU e evidências não devem conter senhas ou chaves. Não publique logs completos sem revisão. A Release privada exige que quem baixar tenha acesso ao repositório.
+Registros do QEMU e evidências não devem conter senhas ou chaves. Não publique logs completos sem revisão. O repositório é público; revisar cuidadosamente qualquer arquivo antes de anexá-lo à Release.
 
 ## H55 físico: homologação separada
 

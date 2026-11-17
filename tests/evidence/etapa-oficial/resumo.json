@@ -1,0 +1,36 @@
+{
+  "unit_total": 19,
+  "unit_passed": 17,
+  "unit_skipped": 2,
+  "skipped": [
+    "snapshot Linux",
+    "proteção do runner Bash/Linux"
+  ],
+  "results": [
+    {
+      "check": "validacao",
+      "exit_code": 0,
+      "status": "PASSOU"
+    },
+    {
+      "check": "unittest",
+      "exit_code": 0,
+      "status": "PASSOU"
+    },
+    {
+      "check": "shellcheck",
+      "exit_code": 0,
+      "status": "PASSOU"
+    },
+    {
+      "check": "actionlint",
+      "exit_code": 0,
+      "status": "PASSOU"
+    }
+  ],
+  "shellcheck": "0.11.0",
+  "actionlint": "1.7.12",
+  "iso_build": "NÃO EXECUTADO",
+  "qemu_install_reboot": "NÃO EXECUTADO",
+  "secrets": "Nenhuma chave ou token incluído; dados temporários e caminhos pessoais removidos dos registros."
+}
