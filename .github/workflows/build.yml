@@ -1,4 +1,4 @@
-name: Construir ISO nÃ£o homologada (manual)
+name: Construir ISO não homologada (manual)
 on:
   workflow_dispatch:
     inputs:
@@ -10,12 +10,12 @@ on:
           - self-hosted
         default: ubuntu-24.04
       confirmar_recursos:
-        description: Conferi recursos; usar somente executor padrÃ£o gratuito ou VM prÃ³pria existente.
+        description: Conferi recursos; usar somente executor padrão gratuito ou VM própria existente.
         type: boolean
         required: true
         default: false
       otimizar_disco:
-        description: Remover SDKs dispensÃ¡veis somente da VM efÃªmera GitHub-hosted.
+        description: Remover SDKs dispensáveis somente da VM efêmera GitHub-hosted.
         type: boolean
         default: true
       guardar_rascunho:
@@ -38,10 +38,10 @@ jobs:
       - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803 # v6 verificado
         with:
           persist-credentials: false
-      - name: Liberar SDKs dispensÃ¡veis do runner hospedado
+      - name: Liberar SDKs dispensáveis do runner hospedado
         if: ${{ inputs.runner == 'ubuntu-24.04' && inputs.otimizar_disco }}
         run: sudo --preserve-env=GITHUB_ACTIONS,RUNNER_ENVIRONMENT ./tools/prepare-hosted-runner.sh
-      - name: Conferir recursos antes de instalar dependÃªncias
+      - name: Conferir recursos antes de instalar dependências
         env:
           REPO_PUBLIC: ${{ !github.event.repository.private }}
         shell: bash
@@ -62,7 +62,7 @@ jobs:
           ./tools/preflight.sh
       - name: Construir
         run: sudo -E ./tools/build-iso.sh
-      - name: Inspecionar e dividir (nÃ£o homologa instalaÃ§Ã£o)
+      - name: Inspecionar e dividir (não homologa instalação)
         run: |
           sudo ./tools/test-iso.sh inspect
           sudo ./tools/package-release.sh
@@ -70,7 +70,7 @@ jobs:
         run: |
           cat dist/SHA256SUMS
           cat dist/SHA256SUMS >> "$GITHUB_STEP_SUMMARY"
-          echo 'Candidato nÃ£o homologado. InstalaÃ§Ã£o e reboot NÃƒO EXECUTADOS neste job.' >> "$GITHUB_STEP_SUMMARY"
+          echo 'Candidato não homologado. Instalação e reboot NÃO EXECUTADOS neste job.' >> "$GITHUB_STEP_SUMMARY"
       - name: Guardar candidata em Release de rascunho
         if: ${{ inputs.guardar_rascunho }}
         env:

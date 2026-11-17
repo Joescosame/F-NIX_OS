@@ -21,7 +21,9 @@ cleanup() {
   local status=$? failed=0
   trap - EXIT
   for ((i=${#mounts[@]}-1; i>=0; i--)); do
-    umount "${mounts[i]}" || failed=1
+    if mountpoint -q "${mounts[i]}"; then
+      bash "$ROOT/tools/unmount-tree.sh" "${mounts[i]}" || failed=1
+    fi
   done
   printf 'Build terminou: código %s. Trabalho preservado em %s\n' "$status" "$work"
   ((failed == 0)) || status=1
@@ -67,7 +69,11 @@ cp -a "$work/resolv.original" "$rootfs/etc/resolv.conf"
 if [[ -e "$work/policy.original" ]]; then cp -a "$work/policy.original" "$rootfs/usr/sbin/policy-rc.d"; fi
 chroot "$rootfs" dpkg-query -W -f='${Package} ${Version}\n' > "$tree/casper/filesystem.manifest"
 python3 "$ROOT/tools/update-manifests.py" "$tree/casper" "$rootfs"
-for ((i=${#mounts[@]}-1; i>=0; i--)); do umount "${mounts[i]}"; done
+for ((i=${#mounts[@]}-1; i>=0; i--)); do
+  if mountpoint -q "${mounts[i]}"; then
+    bash "$ROOT/tools/unmount-tree.sh" "${mounts[i]}"
+  fi
+done
 mounts=()
 rm -rf -- "$rootfs/root/fenix"
 rm -f "$rootfs/root/fenix-chroot.sh"

@@ -41,7 +41,7 @@ class AuditTests(unittest.TestCase):
         script=(ROOT/'tools/store-candidate.sh').read_text(encoding='utf-8')
         self.assertIn('--draft --prerelease',script)
 
-    @unittest.skipUnless(sys.platform.startswith('linux'), 'ProteÃ§Ã£o do runner requer Bash/Linux')
+    @unittest.skipUnless(sys.platform.startswith('linux'), 'Proteção do runner requer Bash/Linux')
     def test_cleanup_refuses_non_hosted_environment(self):
         env=dict(os.environ,GITHUB_ACTIONS='false',RUNNER_ENVIRONMENT='self-hosted')
         p=subprocess.run(['bash',str(ROOT/'tools/prepare-hosted-runner.sh')],env=env,capture_output=True)
