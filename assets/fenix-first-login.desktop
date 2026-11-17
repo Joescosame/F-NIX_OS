@@ -1,0 +1,7 @@
+[Desktop Entry]
+Type=Application
+Name=FÊNIX OS - Primeiro acesso
+Exec=/usr/local/lib/fenix/first-login.sh
+OnlyShowIn=XFCE;
+NoDisplay=true
+X-GNOME-Autostart-enabled=true

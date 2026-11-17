@@ -1,0 +1,10 @@
+# PERFIL OPCIONAL e NÃO instalado automaticamente.
+# Intel Ironlake: uso do driver legacy xf86-video-intel pode ser menos estável.
+# Requer teste e acesso por TTY para reverter em caso de tela preta.
+# Tente UXA somente se o modesetting padrão falhar. SNA é alternativa experimental,
+# não um ajuste garantido para a Ironlake.
+Section "Device"
+  Identifier "Intel Legacy Graphics"
+  Driver "intel"
+  Option "AccelMethod" "uxa"
+EndSection

@@ -1,0 +1,10 @@
+[Desktop Entry]
+Type=Application
+Version=1.0
+Name=Hub de Testes FÊNIX
+Comment=Inventário, snapshots, sensores, programas e jogos
+Exec=/usr/local/lib/fenix/hub-testes.sh
+Icon=fenix-hub
+Terminal=false
+Categories=System;Utility;
+StartupNotify=true
