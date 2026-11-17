@@ -6,5 +6,5 @@ Comment=Inventário, snapshots, sensores, programas e jogos
 Exec=/usr/local/lib/fenix/hub-testes.sh
 Icon=fenix-hub
 Terminal=false
-Categories=System;Utility;
+Categories=System;
 StartupNotify=true
