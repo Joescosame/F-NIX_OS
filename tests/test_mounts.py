@@ -29,7 +29,7 @@ kill "$holder"
 wait "$holder" || true
 bash "$1" "$tmp"
 '''
-        result = subprocess.run(['sudo', 'unshare', '--mount', '--fork', 'bash', '-c',
+        result = subprocess.run(['sudo', 'unshare', '--mount', '--pid', '--fork', '--mount-proc', 'bash', '-c',
                                  script, 'regression', str(ROOT/'tools/unmount-tree.sh')],
                                 capture_output=True, text=True)
         self.assertEqual(result.returncode, 0, result.stdout+result.stderr)

@@ -6,7 +6,7 @@ source "$(dirname -- "$0")/common.sh"
 bash "$ROOT/tools/preflight.sh"
 if [[ ${FENIX_BUILD_NAMESPACE:-} != 1 ]]; then
   export FENIX_BUILD_NAMESPACE=1
-  exec unshare --mount --pid --fork --propagation private -- "$0" "$@"
+  exec unshare --mount --pid --fork --mount-proc --propagation private -- "$0" "$@"
 fi
 bash "$ROOT/tools/fetch-base.sh"
 iso=$(cat "$ROOT/cache/base-path.txt")

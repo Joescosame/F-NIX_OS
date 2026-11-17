@@ -6,7 +6,7 @@ target=${1:?Informe o ponto de montagem}
 echo "Diagnóstico de desmontagem: $target"
 findmnt -R --mountpoint "$target" -o TARGET,SOURCE,FSTYPE,OPTIONS || true
 if command -v fuser >/dev/null; then fuser -vm "$target" || true; fi
-ps -eo pid,ppid,stat,comm,args
+ps -eo pid,ppid,stat,comm,args || true
 # util-linux desmonta filhos antes do pai; sem lazy/force e sem matar processos.
 umount --recursive -- "$target"
 if mountpoint -q "$target"; then
