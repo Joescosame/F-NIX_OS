@@ -7,7 +7,9 @@ source "$(dirname -- "$0")/common.sh"
 need gh
 python3 "$ROOT/tools/release.py" verify "$ROOT/dist/release"
 tag="candidata-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-notes="$ROOT/dist/candidata-notas.md"
+notes=$(mktemp)
+trap 'rm -f -- "$notes"' EXIT
+stat -c 'ISO: %s bytes' "$ROOT/dist/FENIX-OS-Legacy-amd64.iso"
 {
   echo 'CANDIDATA NÃO HOMOLOGADA — rascunho técnico para testes.'
   echo 'Boot SeaBIOS, instalação offline MBR e reinicialização pelo disco: NÃO EXECUTADOS por este build.'
