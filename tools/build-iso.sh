@@ -83,7 +83,9 @@ du -sx --block-size=1 "$rootfs" | cut -f1 > "$tree/casper/filesystem.size"
 python3 "$ROOT/tools/iso-md5.py" "$tree"
 out="$ROOT/dist/FENIX-OS-Legacy-amd64.iso"
 # Importa e reproduz o boot original, incluindo MBR híbrido e El Torito.
-xorriso -indev "$iso" -outdev "$out.partial" -overwrite on -map "$tree" / -boot_image any replay -commit -end
+xorriso -indev "$iso" -outdev "$out.partial" -overwrite on \
+  -map "$tree/casper" /casper -map "$tree/md5sum.txt" /md5sum.txt \
+  -boot_image any replay -commit -end
 mv -- "$out.partial" "$out"
 [[ $(stat -c %s "$out") -lt 7800000000 ]] || die 'ISO excede limite conservador para pendrive de 8 GB.'
 (( $(stat -c %s "$out") < 4000000000 )) || echo 'AVISO: ISO acima da meta de 4 GB.'
