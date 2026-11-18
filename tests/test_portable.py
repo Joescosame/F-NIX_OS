@@ -11,6 +11,14 @@ spec=importlib.util.spec_from_file_location('portable',ROOT/'tools/portable-qa.p
 p=importlib.util.module_from_spec(spec); spec.loader.exec_module(p)
 
 class PortableTests(unittest.TestCase):
+    def test_static_casper_order_preserved_and_extended(self):
+        original='/scripts/casper-bottom/05mountpoints "$@"\n/scripts/casper-bottom/99casperboot "$@"\n'
+        result=p.extend_casper_order(original)
+        self.assertTrue(result.startswith(original))
+        self.assertEqual(result.count('/scripts/casper-bottom/99fenix-qa "$@"'),1)
+        for invalid in ('', 'run-parts /scripts/casper-bottom',result):
+            with self.assertRaises(ValueError): p.extend_casper_order(invalid)
+
     def test_padding_precedes_external_writer(self):
         with tempfile.TemporaryDirectory() as tmp:
             path=pathlib.Path(tmp)/'initrd'

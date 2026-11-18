@@ -26,6 +26,12 @@ def align_cpio(output):
     output.write(b'\0' * (-output.tell() % 4))
     output.flush()  # O subprocesso cpio escreve diretamente no descritor herdado.
 
+def extend_casper_order(original):
+    # initramfs-tools usa ORDER estático; não descobre novos scripts no boot.
+    if '/scripts/casper-bottom/99casperboot "$@"' not in original or '99fenix-qa' in original:
+        raise ValueError('ORDER Casper inesperado; não substituir cegamente')
+    return original+'\n/scripts/casper-bottom/99fenix-qa "$@"\n'
+
 def command(disk, mode, controller, acceleration, sock, serial, install=False, initrd=None, varfile=None):
     for path in (disk,sock,serial):
         if any(c in str(path) for c in (',','\n','\r')): raise ValueError('Caminho QEMU inválido')
@@ -76,6 +82,11 @@ cp /fenix-payload/install.service "$dest/etc/systemd/system/fenix-qa-install.ser
 ln -s ../fenix-qa-install.service "$dest/etc/systemd/system/multi-user.target.wants/fenix-qa-install.service"
 ''')
     script.chmod(0o755)
+    with tempfile.TemporaryDirectory(prefix='expanded-initrd-',dir=OUT) as expanded:
+        run('unmkinitramfs',str(OUT/'initrd-original'),expanded)
+        orders=list(pathlib.Path(expanded).rglob('scripts/casper-bottom/ORDER'))
+        if len(orders)!=1: raise RuntimeError('Não foi encontrado um único ORDER Casper original')
+        (script.parent/'ORDER').write_text(extend_casper_order(orders[0].read_text()))
     initrd=OUT/'initrd-qa'
     shutil.copyfile(OUT/'initrd-original',initrd)
     names=subprocess.check_output(['find','.','-print0'],cwd=payload)
