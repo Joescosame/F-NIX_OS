@@ -1,0 +1,8 @@
+[Desktop Entry]
+Type=Application
+Name=Diagnóstico de Upgrade FÊNIX
+Comment=Inventário local e comparação de hardware, sem alterações automáticas
+Exec=python3 /usr/local/lib/fenix/diagnostico-upgrade.py --gui
+Icon=fenix-hub
+Categories=System;
+Terminal=false

@@ -3,7 +3,10 @@
 set -Eeuo pipefail
 [[ $(uname -s) == Linux ]] || exit 1
 if grep -qw boot=casper /proc/cmdline; then echo 'FALHOU: ainda em Live'; exit 1; fi
-[[ ! -d /sys/firmware/efi ]] || { echo 'FALHOU: boot UEFI'; exit 1; }
+expected_firmware=${1:-legacy}
+expected_table=${2:-dos}
+firmware=legacy
+[[ ! -d /sys/firmware/efi ]] || firmware=uefi
 [[ -n ${DISPLAY:-} ]] || { echo 'FALHOU: falta sessão gráfica'; exit 1; }
 pgrep -u "$UID" -x xfce4-session >/dev/null
 command -v hub-testes >/dev/null
@@ -30,7 +33,10 @@ out=$(mktemp -d "$HOME/fenix-qa.XXXXXXXX")
 [[ -b /dev/zram0 ]] || { echo 'FALHOU: zram ausente'; exit 1; }
 swapon --show=NAME --noheadings | grep -q '^/dev/zram0$'
 rootdev=$(findmnt -n -o SOURCE /)
-lsblk -s -n -o PTTYPE "$rootdev" | grep -qx dos || { echo 'FALHOU: tabela MBR não confirmada'; exit 1; }
+tabela=$(lsblk -s -n -o PTTYPE "$rootdev" | awk 'NF {print $1}' | sort -u)
+esp=()
+if mountpoint -q /boot/efi && [[ $(findmnt -n -o FSTYPE /boot/efi) == vfat ]]; then esp=(--esp-montada); fi
+python3 "$(dirname -- "$0")/platform-check.py" "$firmware" "$tabela" "$expected_firmware" "$expected_table" "${esp[@]}"
 python3 /usr/local/lib/fenix/historico-sensores.py --duration 1 --interval 0.5 --output-dir "$out/historico"
 FENIX_NO_GUI=1 /usr/local/lib/fenix/salvar-snapshot.sh > "$out/snapshot.txt"
 echo "PASSOU: verificações locais parciais. Evidências em $out. Abra o Hub e teste os botões; não equivale à homologação total."

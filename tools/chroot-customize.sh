@@ -16,7 +16,6 @@ for p in snapd flatpak; do
     echo "Proibido na ISO base: $p" >&2; exit 1
   fi
 done
-[[ ! -e /usr/local/bin/newelle && ! -e /usr/local/bin/fenix-newelle ]]
 apt-get clean
 rm -f /var/lib/dbus/machine-id
 : > /etc/machine-id

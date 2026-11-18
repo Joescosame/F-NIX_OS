@@ -56,7 +56,7 @@ if xfconf-query -c xfce4-panel -p /panels/panel-1/position >/dev/null 2>&1; then
 else
   echo 'Painel nativo não identificado. Use Painel > Preferências para mover ao topo.'
 fi
-# Na Ironlake, compositor desligado por padrão; pode ser reativado no ajuste do xfwm4.
+# Perfil leve: compositor desligado, reversível nas preferências do gerenciador de janelas.
 set_pref xfwm4 /general/use_compositing bool false
 if command -v xfce4-popup-whiskermenu >/dev/null; then
   if ! xfconf-query -c xfce4-panel -lv 2>/dev/null | grep -qi whiskermenu; then
@@ -87,7 +87,7 @@ EOF2
 fi
 # Notificações no topo direito; histórico na versão do notifyd disponível pelo painel de ajustes.
 set_pref xfce4-notifyd /notify-location uint 2
-# Nunca impor WhiteSur ou compositor num Ironlake antes do teste de estabilidade.
+# Temas adicionais dependem de testes de estabilidade.
 # Adiciona as ações do Thunar sem apagar outras ações existentes.
 python3 - "$HOME/.config/Thunar/uca.xml" <<'PY'
 import sys, xml.etree.ElementTree as ET

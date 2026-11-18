@@ -5,7 +5,7 @@ for tool in xfce4-session xfce4-panel xfce4-terminal xfce4-popup-whiskermenu pla
   if command -v "$tool" >/dev/null; then echo "PASSOU: executável $tool";
   else echo "FALHOU: ausente $tool"; fail=$((fail+1)); fi
 done
-for tool in hardinfo2 hwall system-monitoring-center goverlay mangohud waydroid; do
+for tool in hardinfo2 hwall system-monitoring-center; do
   command -v "$tool" >/dev/null || echo "NÃO INCLUÍDO: $tool (opcional; fallback no Hub)"
 done
 ((fail == 0))

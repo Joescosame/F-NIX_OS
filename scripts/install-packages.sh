@@ -26,7 +26,7 @@ fi
 mapfile -t packages < "$base/config/packages.txt"
 apt-get install -y --no-install-recommends "${packages[@]}"
 cp "$base/config/packages.txt" /usr/local/share/fenix/required-packages.txt
-for p in mangohud goverlay glmark2 cpu-x; do
+for p in glmark2 cpu-x; do
   candidate=$(apt-cache policy "$p" | awk '/Candidate:/ {print $2}')
   if [[ -n $candidate && $candidate != '(none)' ]]; then
     apt-get install -y --no-install-recommends "$p"
