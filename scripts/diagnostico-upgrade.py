@@ -100,10 +100,12 @@ def coletar(raiz=pathlib.Path('/')):
                     'Nenhum teste funcional foi executado. Sem inferência automática de incompatibilidade.'])
 
 def validar(dados):
-    if dados.get('schema') != SCHEMA or not isinstance(dados.get('componentes'),list):
+    if not isinstance(dados,dict) or dados.get('schema') != SCHEMA or not isinstance(dados.get('componentes'),list):
         raise ValueError('Formato de inventário incompatível.')
     vistos = set()
     for item in dados['componentes']:
+        if not isinstance(item,dict):
+            raise ValueError('Componente deve ser um objeto de inventário.')
         chave = (item.get('categoria'),item.get('localizacao'))
         if not all(isinstance(v,str) and v for v in chave) or chave in vistos:
             raise ValueError('Componente duplicado ou identificação inválida.')

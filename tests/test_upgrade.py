@@ -54,7 +54,7 @@ class UpgradeTests(unittest.TestCase):
     def test_unavailable_and_schema_rejected(self):
         with tempfile.TemporaryDirectory() as tmp:
             self.assertEqual(d.coletar(pathlib.Path(tmp))['componentes'],[])
-        for dados in ({'schema':2,'componentes':[]},{'schema':1,'componentes':[{},{}]}):
+        for dados in ([], {'schema':1,'componentes':[None]}, {'schema':2,'componentes':[]},{'schema':1,'componentes':[{},{}]}):
             with self.assertRaises(ValueError): d.validar(dados)
         item=d.componente('gpu','slot',{})
         with self.assertRaises(ValueError): d.validar({'schema':1,'componentes':[item,item]})

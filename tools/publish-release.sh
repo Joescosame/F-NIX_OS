@@ -21,7 +21,7 @@ for part in m['parts']:
 PY
 notes="$ROOT/dist/release-notes.md"
 cat > "$notes" <<'TEXT'
-Candidato FÊNIX OS Legacy. Pré-lançamento, sem homologação física H55 presumida.
+Candidato FÊNIX OS. Pré-lançamento, sem homologação física presumida.
 Baixe todas as partes, manifesto e JUNTAR_ISO.ps1; execute o script para verificar e reconstruir a ISO.
 Consulte docs/QA.md e docs/INSTALACAO_WINDOWS_RUFUS.md. Nenhuma cobrança é habilitada por este script.
 TEXT
