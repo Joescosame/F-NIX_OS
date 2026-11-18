@@ -8,6 +8,7 @@ on:
         options:
           - construir
           - boot-live
+          - portable-install
         default: construir
       runner:
         description: Executor; self-hosted exige VM Ubuntu 24.04 x64 dedicada
@@ -36,7 +37,7 @@ concurrency:
   cancel-in-progress: false
 jobs:
   build:
-    if: ${{ inputs.confirmar_recursos && inputs.modo != 'boot-live' }}
+    if: ${{ inputs.confirmar_recursos && inputs.modo == 'construir' }}
     permissions:
       contents: write # Token exposto somente na etapa de rascunho; checkout sem credenciais persistidas.
     runs-on: ${{ inputs.runner == 'self-hosted' && fromJSON('["self-hosted", "Linux", "X64", "fenix-noble"]') || 'ubuntu-24.04' }}
@@ -115,4 +116,46 @@ jobs:
             tar -czf "$name" -C qa boot-live
             gh release upload "$(cat dist/candidate-tag.txt)" "$name" --repo Joescosame/F-NIX_OS
             echo 'Coleta terminada. Aprovação do boot depende da revisão das capturas.' >> "$GITHUB_STEP_SUMMARY"
+          fi
+  portable-install:
+    if: ${{ inputs.confirmar_recursos && inputs.modo == 'portable-install' }}
+    runs-on: ubuntu-24.04
+    timeout-minutes: 110
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@d23441a48e516b6c34aea4fa41551a30e30af803
+        with:
+          persist-credentials: false
+      - name: Recursos e ferramentas da campanha virtual
+        run: |
+          test '${{ github.event.repository.private }}' = false
+          sudo --preserve-env=GITHUB_ACTIONS,RUNNER_ENVIRONMENT ./tools/prepare-hosted-runner.sh
+          test "$(df -Pk . | awk 'END {print int($4/1024/1024)}')" -ge 35
+          sudo apt-get update
+          sudo apt-get install -y qemu-system-x86 qemu-utils ovmf seabios xorriso cpio initramfs-tools-core zstd python3-pil python3-yaml shellcheck desktop-file-utils
+          ./tools/lint.sh
+      - name: Recuperar somente a candidata imutável
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          mkdir -p dist
+          tag=$(gh api repos/Joescosame/F-NIX_OS/releases --jq '.[] | select(.draft and .name == "FÊNIX candidata 44002337245 — NÃO HOMOLOGADA") | .tag_name')
+          test -n "$tag"
+          printf '%s\n' "$tag" > dist/candidate-tag.txt
+          gh release download "$tag" --repo Joescosame/F-NIX_OS --dir dist/release --pattern '*.part*' --pattern manifesto.json
+          python3 tools/release.py join dist/release
+      - name: Instalar offline e migrar o mesmo QCOW2 sem ISO
+        run: python3 tools/portable-qa.py
+      - name: Preservar somente evidências pequenas da campanha
+        if: ${{ always() }}
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if test -d qa/portable && test -f dist/candidate-tag.txt; then
+            name="portable-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}.tar.gz"
+            find qa/portable -type f \( -name '*.png' -o -name '*.json' -o -name 'serial.log' -o -name 'qemu.log' \) -not -path '*/payload/*' -print0 > /tmp/fenix-evidence-list
+            tar --null -T /tmp/fenix-evidence-list -czf "$name"
+            gh release upload "$(cat dist/candidate-tag.txt)" "$name" --repo Joescosame/F-NIX_OS
+            echo 'Campanha virtual; revisão de evidências obrigatória. Não homologa hardware físico.' >> "$GITHUB_STEP_SUMMARY"
           fi
