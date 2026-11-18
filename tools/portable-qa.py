@@ -21,6 +21,10 @@ def run(*cmd,**kw): return subprocess.run(cmd,check=True,**kw)
 def digest(path):
     with path.open('rb') as stream: return hashlib.file_digest(stream,'sha256').hexdigest()
 
+def align_cpio(output):
+    # Cada cabeçalho newc deve começar em ALGN(4), inclusive após membro comprimido.
+    output.write(b'\0' * (-output.tell() % 4))
+
 def command(disk, mode, controller, acceleration, sock, serial, install=False, initrd=None, varfile=None):
     for path in (disk,sock,serial):
         if any(c in str(path) for c in (',','\n','\r')): raise ValueError('Caminho QEMU inválido')
@@ -75,6 +79,7 @@ ln -s ../fenix-qa-install.service "$dest/etc/systemd/system/multi-user.target.wa
     shutil.copyfile(OUT/'initrd-original',initrd)
     names=subprocess.check_output(['find','.','-print0'],cwd=payload)
     with initrd.open('ab') as output:
+        align_cpio(output)
         run('cpio','--null','-o','--format=newc',input=names,cwd=payload,stdout=output)
     return initrd
 
@@ -117,6 +122,10 @@ def campaign_run(name, mode, controller, disk, acceleration, initrd=None):
                         serial=(case/'serial.log').read_text(errors='replace') if (case/'serial.log').exists() else ''
                         marker='FENIX_QA_INSTALADOR_CONCLUIDO' if initrd else 'FENIX_QA_BOOT_OK'
                         found=marker in serial
+                        if 'Initramfs unpacking failed:' in serial:
+                            raise RuntimeError('Kernel rejeitou o initramfs; consultar serial.log')
+                        if initrd and elapsed>600 and 'FENIX_QA_LIVE_INICIADO' not in serial:
+                            raise TimeoutError('Serviço de QA não iniciou no Live em 10 minutos')
                         if re.search(r'FENIX_QA_\w*ERROR',serial):
                             raise RuntimeError('Erro explícito no instalador/hook; consultar serial.log')
                         if elapsed-last_capture>=90 or (found and not success):

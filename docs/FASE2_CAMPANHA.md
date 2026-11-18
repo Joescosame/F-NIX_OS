@@ -32,3 +32,11 @@ QEMU usa 2 vCPUs/4 GiB, Westmere e VGA std; KVM quando acessível, senão TCG. L
 - [GRUB BIOS/GPT](https://www.gnu.org/software/grub/manual/grub/html_node/BIOS-installation.html) e [EFI removível](https://www.gnu.org/software/grub/manual/grub/html_node/Installing-GRUB-using-grub_002dinstall.html).
 
 Estado inicial: instalação e migração **NÃO EXECUTADOS**. Será atualizado com execução e evidências reais. A homologação física e Secure Boot continuam fora do aceite.
+
+## Diagnóstico da primeira tentativa
+
+[Execução 44283462064](https://github.com/Joescosame/F-NIX_OS/actions/runs/44283462064): validações Linux e reconstrução com SHA-256 **PASSARAM**. Campanha interrompida após 8 minutos de VM porque o serviço de QA não iniciou. A serial registrou `Initramfs unpacking failed: invalid magic at start of compressed archive`; a captura de 450 s mostra o desktop Live, sem execução do instalador. Instalação e migração: **NÃO EXECUTADOS**.
+
+A extensão newc começava imediatamente após os 82.518.462 bytes do initrd original, em offset com resto 2 na divisão por 4. O [formato initramfs do kernel](https://www.kernel.org/doc/html/latest/driver-api/early-userspace/buffer-format.html) exige alinhamento ALGN(4). A correção acrescenta dois bytes nulos antes do arquivo CPIO temporário; não modifica o original ou a ISO. Regressão cobre todos os restos e o tamanho observado. O executor agora aborta cedo diante do erro do kernel ou de 10 minutos sem início do serviço.
+
+Evidências preservadas no rascunho: `portable-44283462064-1.tar.gz`, SHA-256 `0d5b692ac4a11fa368ed1c5656039b2ce5f537d22d4b5f56f18bdc9e39bf9d3f`. A correção requer nova execução real antes de qualquer aprovação.

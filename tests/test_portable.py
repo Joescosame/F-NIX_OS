@@ -1,4 +1,5 @@
 import importlib.util
+import io
 import pathlib
 import tempfile
 import unittest
@@ -8,6 +9,16 @@ spec=importlib.util.spec_from_file_location('portable',ROOT/'tools/portable-qa.p
 p=importlib.util.module_from_spec(spec); spec.loader.exec_module(p)
 
 class PortableTests(unittest.TestCase):
+    def test_newc_extension_aligned_after_any_original_length(self):
+        for size in (0, 1, 2, 3, 4, 82518462):
+            # Não altera bytes originais nem adiciona um bloco quando já alinhado.
+            output=io.BytesIO(b'x'*size); output.seek(0,2)
+            p.align_cpio(output)
+            self.assertEqual(output.tell()%4,0)
+            self.assertEqual(output.tell(),size+(-size%4))
+            self.assertEqual(output.getvalue()[:size],b'x'*size)
+            self.assertEqual(output.getvalue()[size:],b'\0'*(-size%4))
+
     def test_no_iso_in_any_installed_boot_and_same_disk(self):
         disk=pathlib.Path('/qa/destino.qcow2')
         for mode in ('legacy','uefi'):
