@@ -16,10 +16,16 @@ Nenhum script do host particiona ou formata disco. O construtor não recebe disp
 
 Os namespaces de montagem e processos evitam propagação de mounts e separam a árvore de processos. O chroot recebe `/dev` em tmpfs com somente dispositivos de caracteres essenciais e devpts próprio; discos do host não são compartilhados. Uma política temporária impede inicialização de serviços. Isso reduz exposição acidental, mas um chroot root não deve ser considerado uma sandbox para código malicioso: use somente fontes confiáveis numa VM descartável. DNS e política original são restaurados antes da recompressão. Árvore e logs permanecem em `work/build.*` para investigação. Não se remove árvore de build automaticamente após falha; desmonte antes de limpar.
 
-Mantemos kernel e initrd da base, driver i915/Mesa, sem driver Xorg forçado. Waydroid, HWall, HardInfo2, SMC e WhiteSur não são instalados pela base. MangoHud/GOverlay só são incluídos se houver candidato apt; continuam sujeitos a teste real. Vulkan e jogos recentes não são prometidos na Ironlake.
+Mantemos kernel e initrd estáveis da base, drivers genéricos do kernel/Mesa e detecção automática, sem driver Xorg forçado ou proprietário automático. Ferramentas avançadas dependem de homologação; as integrações canceladas foram retiradas conforme ADR 0003. Nenhuma portabilidade universal ou API gráfica é presumida.
 
 As versões dos pacotes são registradas. Repetir o procedimento é possível, mas os repositórios apt mudam: **não se promete ISO idêntica byte a byte** sem espelho/snapshot apt congelado e timestamps normalizados. A assinatura da ISO não autentica pacotes externos; não entram automaticamente.
 
 ## Dados e licenças
 
 Históricos e snapshots permanecem locais, com permissão restrita. Relatórios podem incluir identificadores; não entram no Git ou em Release automaticamente. Leia `LICENCAS.md` antes de distribuir uma ISO. O nome FÊNIX não implica endosso do Linux Mint.
+
+## Evolução arquitetural — Fase 1
+
+Decisões em adr/: disco portátil GPT com dois destinos de boot (proposto), diagnóstico local sem telemetria (implementado), separação coleta/overlay e Android isolado (pesquisa), identidade genérica PT-BR. PORTABILIDADE.md detalha GRUB, instalador, initramfs, recuperação e matriz de migração do mesmo QCOW2. Nenhuma alteração desses componentes críticos foi executada nesta fase.
+
+diagnostico-upgrade.py lê proc/sysfs sob demanda, salva JSON restrito e compara registros; o Hub e o .desktop chamam a mesma entrada. Não inicia daemon. Dados simulados validam contratos, ausências e diferenças; GUI instalada e hardware real permanecem pendentes. CENTRAL_DESEMPENHO.md e MOTOR_ANDROID.md são propostas sem implementação nesta fase.

@@ -1,3 +1,7 @@
+# Fase 1 arquitetural — 18/11/2026
+
+Retiradas integrações canceladas; inventário e comparação local; perfis explícitos de QA; ADRs e estudos de portabilidade, monitoramento e Android. Referência de build/boot preservada. Sem nova ISO ou merge.
+
 # Histórico de alterações
 
 ## Integração oficial F-NIX_OS — continuação da versão 0.3.0-dev

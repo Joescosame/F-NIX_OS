@@ -8,14 +8,14 @@ Estados permitidos: **PASSOU**, **FALHOU**, **BLOQUEADO**, **NÃO EXECUTADO**. A
 
 `test-iso.sh inspect` verifica hash e estrutura de boot. `test-iso.sh install` abre QEMU com SeaBIOS, Westmere, 2 vCPUs, 4096 MiB, disco virtual qcow2 de 32 GiB, IDE e sem rede. Para 8 GB use `--ram 8192`. Não conecta pastas/discos físicos. A GUI requer DISPLAY no host; em CI sem GUI esta etapa fica NÃO EXECUTADA.
 
-## Campanha obrigatória offline
+## Campanha histórica de referência — offline Legacy/MBR
 
 1. Guarde hash da ISO e commit. Execute `./tools/test-iso.sh install`.
 2. Capture o menu BIOS e o desktop Live. Confirme teclado e mouse. Abra **Instalar FÊNIX (modo offline)** pelo menu. Não habilite downloads de codecs ou atualizações.
-3. No particionamento manual, crie tabela **msdos/MBR**, uma partição ext4 raiz e selecione o disco virtual inteiro para GRUB. Não criar tabela GPT. O único disco interno exibido é o QEMU de 32 GiB. Registre tela de particionamento, início e fim da instalação.
+3. No particionamento manual, crie tabela **msdos/MBR**, uma partição ext4 raiz e selecione o disco virtual inteiro para GRUB. Esta campanha específica usa MBR; a campanha portátil futura exige GPT conforme PORTABILIDADE.md. O único disco interno exibido é o QEMU de 32 GiB. Registre tela de particionamento, início e fim da instalação.
 4. Selecione manualmente São Paulo/Brasília. Registre duração na etapa de horário. Se travar, capture tela e logs `/var/log/installer`, `/var/log/syslog`, `/var/log/partman`, sem marcar corrigido. Registre também horário da BIOS/RTC, estado da rede e versão Ubiquity.
 5. Ao concluir, desligue. `-no-reboot` encerra QEMU quando o convidado solicita reinício. Execute **`./tools/test-iso.sh reboot`**. Esse comando não contém `-cdrom` e usa boot pelo disco.
-6. Entre com usuário e senha criados; capture login e desktop. Copie e execute `tools/guest-check.sh` dentro do convidado. Ele recusa Live e UEFI, verifica Xfce, componentes, tabela MBR e zram; coleta serviços/memória/swap e histórico. Copie evidências para `qa/offline/` no host por meio controlado após o teste.
+6. Entre com usuário e senha criados; capture login e desktop. Copie e execute `tools/guest-check.sh` dentro do convidado. Ele recusa Live e, por padrão, exige perfil legacy/dos; argumentos explícitos permitem legacy/gpt ou uefi/gpt (com ESP FAT montada), além de verificar Xfce, componentes e zram; coleta serviços/memória/swap e histórico. Copie evidências para `qa/offline/` no host por meio controlado após o teste.
 7. Abra o Hub; teste cada botão, snapshot, CSV/JSONL, fallback hardinfo, monitor e configuração reversível. Faça logout/login para testar Plank, atalhos e Super isolado. Snapshot é relatório, não imagem de recuperação.
 
 O harness automatiza preparação, isolamento, comandos e registros; **não automatiza cliques no instalador nem aprova telas por inferência**. O JSON de execução continua NÃO EXECUTADO até revisão explícita das evidências. O teste de instalação fim a fim ainda precisa ser implementado/homologado para CI sem operador.
@@ -32,6 +32,10 @@ Registros do QEMU e evidências não devem conter senhas ou chaves. Não publiqu
 
 ## H55 físico: homologação separada
 
-QEMU não emula a GPU Ironlake nem o chipset H55. Após aprovação virtual, use USB BIOS Legacy e valide i915/Mesa (`lspci -k`, `glxinfo -B`), áudio, rede, USB, RAM, temperaturas, HD/SSD SATA, boot MBR e reinicialização sem pendrive. Compare swap/zram e desempenho com medições salvas. Não prometa Vulkan/Waydroid ou equivalência com Windows sem teste. A formatação física permanece seleção manual, após backup e conferência de modelo/capacidade.
+QEMU não emula a GPU Ironlake nem o chipset H55. Após aprovação virtual, use USB BIOS Legacy e valide i915/Mesa (`lspci -k`, `glxinfo -B`), áudio, rede, USB, RAM, temperaturas, HD/SSD SATA, boot MBR e reinicialização sem pendrive. Compare swap/zram e desempenho com medições salvas. Não prometa APIs gráficas ou equivalência com outro sistema sem teste. A formatação física permanece seleção manual, após backup e conferência de modelo/capacidade.
 
 Reprovar se boot falhar, instalador não concluir, disco não reiniciar, usuário não conseguir entrar, Xfce/Hub não persistirem ou ocorrer corrupção. Tratar extras como pendentes; não sacrificar a base para incluí-los.
+
+## Campanha portátil futura
+
+Ver PORTABILIDADE.md. O mesmo QCOW2 deve iniciar sem ISO em SeaBIOS e OVMF e retornar ao firmware anterior sem reinstalar. Perfil portable-gpt-v1 exige evidências e disco_campanha coincidente. Testes simulados desses verificadores não aprovam portabilidade. Nesta Fase 1 todos esses boots permanecem NÃO EXECUTADOS.

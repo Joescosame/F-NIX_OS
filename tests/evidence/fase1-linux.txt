@@ -1,0 +1,34 @@
+Execução: https://github.com/Joescosame/F-NIX_OS/actions/runs/44280632624
+Commit de código: 15ec1bcdbbb13ca9949cd6a1b602c37ac10b898a
+Host: Ubuntu 24.04, workflow manual Validar fontes.
+PASSOU: Python AST, YAML, campos desktop, SVG, estrutura e finais de linha.
+test_boot_requires_enabled_bios_and_mbr (test_audit.AuditTests.test_boot_requires_enabled_bios_and_mbr) ... ok
+test_cleanup_refuses_non_hosted_environment (test_audit.AuditTests.test_cleanup_refuses_non_hosted_environment) ... ok
+test_manual_workflow_has_no_paid_runner_or_default_upload (test_audit.AuditTests.test_manual_workflow_has_no_paid_runner_or_default_upload) ... ok
+test_approval_rejects_unexecuted_and_different_iso (test_core.BuildSafetyTests.test_approval_rejects_unexecuted_and_different_iso) ... ok
+test_installer_manifests_keep_profile_and_language (test_core.BuildSafetyTests.test_installer_manifests_keep_profile_and_language) ... ok
+test_no_physical_disk_arguments_in_harness (test_core.BuildSafetyTests.test_no_physical_disk_arguments_in_harness) ... ok
+test_history_csv_jsonl_and_limits (test_core.OfflineTests.test_history_csv_jsonl_and_limits) ... ok
+test_qemu_reboot_has_no_iso_and_offline_no_network (test_core.OfflineTests.test_qemu_reboot_has_no_iso_and_offline_no_network) ... ok
+test_snapshot_hash_manifest (test_core.OfflineTests.test_snapshot_hash_manifest) ... ok
+test_corruption_is_rejected (test_core.ReleaseTests.test_corruption_is_rejected) ... ok
+test_missing_part_is_rejected (test_core.ReleaseTests.test_missing_part_is_rejected) ... ok
+test_roundtrip_and_no_overwrite (test_core.ReleaseTests.test_roundtrip_and_no_overwrite) ... ok
+test_traversal_order_and_oversize_rejected (test_core.ReleaseTests.test_traversal_order_and_oversize_rejected) ... ok
+test_verify_rejects_wrong_final_hash_without_joining (test_core.ReleaseTests.test_verify_rejects_wrong_final_hash_without_joining) ... ok
+test_windows_powershell_51_roundtrip (test_core.ReleaseTests.test_windows_powershell_51_roundtrip) ... skipped 'Windows PowerShell 5.1 ausente'
+test_windows_powershell_rejects_corruption (test_core.ReleaseTests.test_windows_powershell_rejects_corruption) ... skipped 'Windows PowerShell 5.1 ausente'
+test_original_reproduces_none_get_data (test_core.TimezoneTests.test_original_reproduces_none_get_data) ... ok
+test_patch_handles_cancelled_empty_and_malformed (test_core.TimezoneTests.test_patch_handles_cancelled_empty_and_malformed) ... ok
+test_patch_idempotent_and_unknown_layout_rejected (test_core.TimezoneTests.test_patch_idempotent_and_unknown_layout_rejected) ... ok
+test_valid_reply_and_stale_reply (test_core.TimezoneTests.test_valid_reply_and_stale_reply) ... ok
+test_nested_mount_and_busy_mount (test_mounts.MountTests.test_nested_mount_and_busy_mount) ... ok
+test_cancelled_integrations_absent_from_runtime (test_upgrade.UpgradeTests.test_cancelled_integrations_absent_from_runtime) ... ok
+test_collect_fixture_private_fields_and_missing_sensors (test_upgrade.UpgradeTests.test_collect_fixture_private_fields_and_missing_sensors) ... ok
+test_compare_changes_driver_and_relocation (test_upgrade.UpgradeTests.test_compare_changes_driver_and_relocation) ... ok
+test_portable_approval_rejects_different_disks (test_upgrade.UpgradeTests.test_portable_approval_rejects_different_disks) ... ok
+test_profiles_preserve_errors_and_dual_boot_structure (test_upgrade.UpgradeTests.test_profiles_preserve_errors_and_dual_boot_structure) ... ok
+test_unavailable_and_schema_rejected (test_upgrade.UpgradeTests.test_unavailable_and_schema_rejected) ... ok
+Ran 27 tests in 2.077s
+OK (skipped=2)
+PASSOU: validações estáticas e testes locais. Boot/instalação pendentes.

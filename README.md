@@ -1,43 +1,29 @@
-# FÊNIX OS — Legacy Edition
+# FÊNIX OS
 
-Repositório oficial: [Joescosame/F-NIX_OS](https://github.com/Joescosame/F-NIX_OS). Branch principal: main.
+Sistema leve baseado no Linux Mint 22.3 Xfce / Ubuntu 24.04 LTS, x86_64, português brasileiro. Repositório oficial exclusivo: [Joescosame/F-NIX_OS](https://github.com/Joescosame/F-NIX_OS). Desenvolvimento por branches e PRs; main não recebe merge sem autorização.
 
-Perfil e construtor de ISO para Linux Mint 22.3 Xfce / Ubuntu 24.04 LTS, x86_64, PT-BR. Alvo: Intel H55, i5-650 (2 núcleos/4 threads), 8 GB DDR3, Ironlake i915/Mesa, BIOS Legacy, SATA e instalação MBR.
+## Evidências existentes
 
-**Versão 0.3.0-dev: ISO NÃO CONSTRUÍDA e instalação NÃO HOMOLOGADA.** Não há ISO ou Release para download. Os testes e bloqueios atuais estão na [auditoria](docs/AUDITORIA.md); os [resultados anteriores](docs/RESULTADOS.md) foram preservados. Organizar o código e corrigir o callback não conclui a missão de comprovar boot → instalação → reboot → login.
+A primeira ISO foi [construída](https://github.com/Joescosame/F-NIX_OS/actions/runs/44002337245) e iniciou no [desktop Live Xfce em SeaBIOS](https://github.com/Joescosame/F-NIX_OS/actions/runs/44006253371). Tem 3.218.407.424 bytes e SHA-256 `1404e0c5dadecb595a3c031bd2538e51379579e18d412dc9ed7cea5b64f6c764`. Permanece preservada na Release de rascunho autenticada. Instalação, reboot pelo disco e portabilidade UEFI NÃO EXECUTADOS. Não é versão estável.
 
-## Começar
+Esta branch executa somente a Fase 1 arquitetural: retira integrações canceladas, implementa Diagnóstico de Upgrade e prepara os critérios da próxima versão. Nenhuma ISO foi reconstruída nesta fase. A candidata anterior não contém essas alterações.
 
-Leia [Comece aqui](docs/COMECE_AQUI.md) e [Build](docs/BUILD.md). Em VM Ubuntu 24.04 x86_64, após instalar as dependências documentadas:
+## Uso e desenvolvimento
+
+Leia [Comece aqui](docs/COMECE_AQUI.md), [arquitetura](docs/ARQUITETURA.md), [roadmap](docs/ROADMAP.md) e [ADRs](docs/adr/0001-portabilidade.md).
 
 ```bash
+python3 scripts/diagnostico-upgrade.py
+python3 scripts/diagnostico-upgrade.py --comparar anterior.json atual.json
 ./tools/lint.sh
-./tools/preflight.sh
-sudo -E ./tools/build-iso.sh
-./tools/test-iso.sh inspect
-./tools/test-iso.sh install
-./tools/test-iso.sh reboot
-./tools/package-release.sh
 ```
 
-Não há automação de particionamento físico. O harness usa qcow2 próprio e SeaBIOS, 2 vCPUs, 4–8 GB, offline por padrão. **A instalação gráfica e sua aprovação ainda são manuais.** O comando reboot não anexa ISO. Veja [QA](docs/QA.md).
+O diagnóstico salva somente dados locais e nunca instala drivers. Consulte [limites e modo gráfico](docs/DIAGNOSTICO_UPGRADE.md). O Hub mantém inventário, diagnóstico, histórico CSV/JSONL, snapshots de diagnóstico, monitoramento, Synaptic e atualizações Mint. Xfce, Whisker, Plank, atalhos, zram e ajustes reversíveis permanecem. Sem Snap, Flatpak ou drivers proprietários instalados automaticamente.
 
-## O que está implementado
+## Próximas campanhas
 
-- Download oficial com SHA-256 e assinatura GPG obrigatórios; uso opcional de ISO local igualmente verificada.
-- Remasterização automática com squashfs/chroot/xorriso, replay de MBR/El Torito e manifests para retenção de personalizações no sistema instalado.
-- Xfce, Whisker, Plank, atalhos, aplicativos leves, zram e configurações reversíveis. Sem Snap/Flatpak, PPAs ou kernel experimental adicionado.
-- Hub: inventário, histórico CSV/JSONL offline, snapshots de diagnóstico, monitor, Synaptic, Mint Update e overlays quando disponíveis.
-- Proteção de resposta vazia/cancelada do GeoIP Ubiquity e entrada de instalação offline sem espera de NTP; [investigação e limites](docs/TIMEZONE.md).
-- Workflows exclusivamente manuais. Nenhum foi disparado, nenhuma cobrança habilitada, nenhuma Release estável automatizada.
-- Divisão em partes de até 1900 MiB, hashes por parte/final, reconstrução PowerShell 5.1 e Linux, gate para draft prerelease após QA.
+[Portabilidade Legacy/UEFI](docs/PORTABILIDADE.md) exige o mesmo disco virtual instalado nos dois firmwares; presença de arquivos GRUB não aprova boot. [Central de Desempenho](docs/CENTRAL_DESEMPENHO.md) e [Motor Android](docs/MOTOR_ANDROID.md) estão em arquitetura/pesquisa e não são recursos prontos. Não avançar para Fase 2 automaticamente.
 
-Newelle/DeepSeek permanece [fase 2](docs/NEWELLE_FASE2.md), fora do build. HWall, HardInfo2, SMC, WhiteSur e Waydroid exigem homologação; a base usa fallbacks. Não se promete Vulkan na Ironlake.
+O [construtor existente](docs/BUILD.md) verifica assinatura GPG e hash oficiais, remasteriza em chroot isolado, preserva boot e manifests, divide em partes de 1900 MiB e fornece scripts de reconstrução para Windows/Linux. Workflows são exclusivamente manuais, sem contratação de runners ou armazenamento pago. Nesta fase executar apenas Validar fontes.
 
-## Publicação e origem
-
-O destino oficial existente é público por decisão expressa do usuário. O progresso local v0.3.0 está preservado e integrado por branch de desenvolvimento, com PR para main. Não criar outro repositório. Consulte [Git no Windows](docs/GIT_WINDOWS.md) e [auditoria técnica](docs/AUDITORIA.md).
-
-Os workflows continuam manuais. A construção usa o runner padrão Ubuntu 24.04; o upload da ISO para Actions fica desligado por padrão para não presumir franquia gratuita de armazenamento. Recursos insuficientes bloqueiam o job; não se contrata executor maior.
-
-Fonte primária: ZIP v0.2.2; 36 arquivos conferidos contra o manifesto original. README/manifesto originais e guias numerados foram preservados. Leia [arquitetura](docs/ARQUITETURA.md), [licenças](docs/LICENCAS.md), [Windows/Rufus](docs/INSTALACAO_WINDOWS_RUFUS.md) e [histórico](CHANGELOG.md).
+[QA](docs/QA.md), [resultados atuais](docs/FASE1_RESULTADOS.md), [relatório do boot de referência](docs/RESULTADO_BOOT_LIVE.md), [Windows/Rufus](docs/INSTALACAO_WINDOWS_RUFUS.md), [licenças](docs/LICENCAS.md). A origem v0.2.2 e os relatórios históricos permanecem identificados; não executar guias históricos como instruções atuais.

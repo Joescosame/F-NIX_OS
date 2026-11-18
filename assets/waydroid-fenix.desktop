@@ -1,8 +1,0 @@
-[Desktop Entry]
-Type=Application
-Name=Aplicativos Android (experimental)
-Comment=Waydroid opcional; pode não funcionar na Intel Ironlake
-Exec=/usr/local/lib/fenix/waydroid-launcher.sh
-Icon=applications-games
-Terminal=false
-Categories=Game;Emulator;

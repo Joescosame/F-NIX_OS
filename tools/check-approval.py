@@ -8,6 +8,9 @@ import sys
 
 REQUIRED = {'legacy_live','offline_install_mbr','disk_boot_without_iso',
             'login_xfce_hub','history_snapshot','zram_swap_services'}
+PORTABLE = {'legacy_live','uefi_live','offline_install_gpt','legacy_disk_boot',
+            'uefi_disk_boot','migration_legacy_uefi','migration_uefi_legacy',
+            'login_xfce_hub','history_snapshot','zram_swap_services'}
 
 def check(root):
     qa = root / 'qa'
@@ -18,7 +21,18 @@ def check(root):
     with iso.open('rb') as f:
         if hashlib.file_digest(f,'sha256').hexdigest() != data['iso_sha256']:
             raise ValueError('Aprovação pertence a outra ISO')
-    for name in REQUIRED:
+    perfil = data.get('perfil','legacy-mbr-v1')
+    if perfil not in ('legacy-mbr-v1','portable-gpt-v1'):
+        raise ValueError('Perfil de aprovação desconhecido')
+    required = REQUIRED if perfil == 'legacy-mbr-v1' else PORTABLE
+    if perfil == 'portable-gpt-v1':
+        disco = data.get('disco_campanha')
+        if not isinstance(disco,str) or not disco:
+            raise ValueError('Campanha portátil exige identificação do mesmo disco virtual')
+        for nome in ('offline_install_gpt','legacy_disk_boot','uefi_disk_boot','migration_legacy_uefi','migration_uefi_legacy'):
+            if data.get('tests',{}).get(nome,{}).get('disco_campanha') != disco:
+                raise ValueError('Evidências pertencem a discos diferentes ou não identificados')
+    for name in required:
         test = data.get('tests',{}).get(name,{})
         if test.get('status') != 'PASSOU' or not test.get('evidence'):
             raise ValueError('Sem aprovação/evidências: '+name)
