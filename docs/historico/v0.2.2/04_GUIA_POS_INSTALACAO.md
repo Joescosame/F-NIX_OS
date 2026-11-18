@@ -1,4 +1,4 @@
-> Documento histórico v0.2.2 preservado. Para o procedimento atual, siga COMECE_AQUI.md, BUILD.md, QA.md e NEWELLE_FASE2.md. As instruções antigas não autorizam executar módulos ou publicar resultados.
+> HISTÓRICO v0.2.2: não executar estas instruções. Consulte ../../../README.md e os ADRs atuais. Integrações antigas foram canceladas.
 
 # 04 — Guia rápido pós-instalação FÊNIX OS (PT-BR)
 

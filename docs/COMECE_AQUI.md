@@ -1,16 +1,13 @@
 # Comece aqui
 
-O FÊNIX é uma personalização do Linux Mint 22.3 Xfce para o Intel H55/i5-650, 8 GB, Intel Ironlake, SATA e BIOS Legacy. **Ainda não há ISO FÊNIX construída ou instalação homologada nesta entrega.** Consulte o relatório em `RESULTADOS.md`.
+O FÊNIX usa Mint 22.3 Xfce x86_64, para máquinas antigas e modernas compatíveis. Já existe uma candidata com boot Live SeaBIOS aprovado: veja RESULTADO_BOOT_LIVE.md. A instalação completa e o boot UEFI continuam NÃO EXECUTADOS.
 
-No Windows, uma ISO não é uma pasta para copiar programas. Prepare uma **VM Ubuntu 24.04 de 64 bits**, com 8 GB de RAM se o notebook permitir e pelo menos 50 GiB livres no disco virtual. A VM de testes usa mais um disco virtual de 32 GiB. Nunca conecte discos físicos à VM.
+Nesta Fase 1 não construa nova ISO. Para conhecer o diagnóstico nas fontes Linux: `python3 scripts/diagnostico-upgrade.py`; salve antes e depois de trocar hardware e compare conforme DIAGNOSTICO_UPGRADE.md. Não exige sudo. O modo `--gui` usa YAD e oferece texto quando não há ambiente gráfico.
 
-1. Copie este repositório para o disco Linux da VM (não execute o build em pasta compartilhada NTFS).
-2. Siga `BUILD.md` para instalar ferramentas e construir.
-3. Siga `QA.md`: boot Live não comprova instalação. Instale no disco virtual em MBR e reinicie sem CD.
-4. Só após aprovação virtual grave um pendrive e faça a validação física H55.
+Para desenvolvimento, use Ubuntu 24.04 x86_64 ou Validar fontes manual no Actions da branch. `./tools/lint.sh` valida fontes e testes; não aprova hardware real. Os testes no Windows não substituem os Linux.
 
-Não é necessário executar GitHub Actions. O build local não consome minutos do GitHub. Os workflows estão prontos e são **exclusivamente manuais**; nada foi disparado, nenhuma cobrança foi habilitada.
+O Hub mantém ferramentas já operacionais e ganhou Diagnóstico de Upgrade no staging. Snapshot é relatório, não backup de recuperação. Recursos em pesquisa não aparecem como botões sem função.
 
-O Hub reúne inventário, histórico CSV/JSONL, snapshots de diagnóstico, monitoramento, Synaptic e atualizações. Snapshots são relatórios locais do PC; **não são backup/restauração do disco**. Ferramentas avançadas têm fallbacks. Newelle/DeepSeek é opcional e fica fora da ISO base.
+Próxima tarefa: instalação portátil em QCOW2, conforme PORTABILIDADE.md. Não conectar discos físicos. Não converter seu SSD antes de backup e homologação da estratégia. A interface será genérica; hardware inicial consta apenas do QA histórico.
 
-Os guias antigos numerados foram preservados como histórico v0.2.2. Em conflito, siga os novos guias sem prefixo numérico. Cubic continua uma alternativa de exploração, mas a entrega reproduzível usa os scripts novos.
+Os guias em historico/ e origem-v0.2.2/ preservam rastreabilidade; não são procedimentos atuais. Siga ROADMAP.md e os ADRs.
