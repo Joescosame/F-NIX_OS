@@ -24,6 +24,7 @@ def digest(path):
 def align_cpio(output):
     # Cada cabeçalho newc deve começar em ALGN(4), inclusive após membro comprimido.
     output.write(b'\0' * (-output.tell() % 4))
+    output.flush()  # O subprocesso cpio escreve diretamente no descritor herdado.
 
 def command(disk, mode, controller, acceleration, sock, serial, install=False, initrd=None, varfile=None):
     for path in (disk,sock,serial):

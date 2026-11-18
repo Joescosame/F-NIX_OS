@@ -1,6 +1,8 @@
 import importlib.util
 import io
 import pathlib
+import subprocess
+import sys
 import tempfile
 import unittest
 
@@ -9,6 +11,16 @@ spec=importlib.util.spec_from_file_location('portable',ROOT/'tools/portable-qa.p
 p=importlib.util.module_from_spec(spec); spec.loader.exec_module(p)
 
 class PortableTests(unittest.TestCase):
+    def test_padding_precedes_external_writer(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path=pathlib.Path(tmp)/'initrd'
+            path.write_bytes(b'xx')
+            with path.open('ab') as output:
+                p.align_cpio(output)
+                subprocess.run([sys.executable,'-c','import sys; sys.stdout.buffer.write(b"070701")'],
+                               stdout=output,check=True)
+            self.assertEqual(path.read_bytes(),b'xx\0\0' + b'070701')
+
     def test_newc_extension_aligned_after_any_original_length(self):
         for size in (0, 1, 2, 3, 4, 82518462):
             # Não altera bytes originais nem adiciona um bloco quando já alinhado.
