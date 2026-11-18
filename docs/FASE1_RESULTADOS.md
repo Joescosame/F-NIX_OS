@@ -11,7 +11,7 @@ Referência preservada: build 44002337245 e boot Live SeaBIOS 44006253371; ISO 3
 | ShellCheck e Actionlint | PASSOU | Scripts ativos e workflows existentes |
 | Inventário/comparação | PASSOU | Dados simulados, privacidade, ausências, formato e diferenças; não homologa hardware |
 | Perfis firmware e gate de aprovação | PASSOU | Fixtures, rejeição de firmware/tabela incorretos, ESP ausente e discos diferentes |
-| Bash e desktop-file-validate nativos | NÃO EXECUTADO | Pendente execução Linux desta branch |
+| Bash e desktop-file-validate nativos | PASSOU | Execução Linux 44280632624 |
 | Diagnóstico na GUI instalada | NÃO EXECUTADO | YAD integra a mesma coleta; nenhuma nova ISO nesta fase |
 | Boot do mesmo disco em Legacy e UEFI | NÃO EXECUTADO | Campanha Fase 2 |
 | Monitoramento/overlay próprios | NÃO EXECUTADO | Arquitetura Fase 3 |
@@ -22,3 +22,5 @@ Foram retirados scripts, dependências e atalhos dos componentes cancelados. His
 Limites: inventário básico sem serial/MAC/UUID e sem DIMMs individuais; alterações de porta podem aparecer como adição/remoção. Sem teste funcional automático ou diagnóstico universal de incompatibilidade. Portabilidade depende de pacotes GRUB/Ubiquity, firmware, initramfs e migração real; hardware original físico continua não homologado.
 
 Próxima execução recomendada: investigar e implementar a instalação GPT portátil somente em QCOW2 descartável, conforme PORTABILIDADE.md; não iniciar automaticamente a Fase 2.
+
+Validação Linux final: [44280632624](https://github.com/Joescosame/F-NIX_OS/actions/runs/44280632624), código 15ec1bcdbbb13ca9949cd6a1b602c37ac10b898a: 27 testes, 25 aprovados e 2 PowerShell ignorados. Todos os seis testes novos passaram. Bash, ShellCheck, desktop-file-validate, Python, YAML e SVG passaram. Resumo público em tests/evidence/fase1-linux.txt; lista de arquivos em ARQUIVOS_FASE1.md.
